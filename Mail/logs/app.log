@@ -1,0 +1,128 @@
+2024-07-10 13:26:47.191 [main] INFO  org.springframework.cloud.config.client.ConfigServicePropertySourceLocator - Fetching config from server at : http://localhost:8888
+2024-07-10 13:26:47.243 [main] INFO  org.springframework.cloud.config.client.ConfigServicePropertySourceLocator - Connect Timeout Exception on Url - http://localhost:8888. Will be trying the next url if available
+2024-07-10 13:26:47.243 [main] WARN  org.springframework.cloud.config.client.ConfigServicePropertySourceLocator - Could not locate PropertySource: I/O error on GET request for "http://localhost:8888/Mail/default": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+2024-07-10 13:26:47.245 [main] INFO  com.example.mail.MailApplication - No active profile set, falling back to 1 default profile: "default"
+2024-07-10 13:26:47.648 [main] INFO  org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-07-10 13:26:47.698 [main] INFO  org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 45 ms. Found 1 JPA repository interfaces.
+2024-07-10 13:26:47.846 [main] INFO  org.springframework.cloud.context.scope.GenericScope - BeanFactory id=14f02cf8-cd12-3760-b983-815d78678944
+2024-07-10 13:26:48.092 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8083 (http)
+2024-07-10 13:26:48.098 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8083"]
+2024-07-10 13:26:48.099 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-07-10 13:26:48.100 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.82]
+2024-07-10 13:26:48.212 [main] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/email] - Initializing Spring embedded WebApplicationContext
+2024-07-10 13:26:48.212 [main] INFO  org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 956 ms
+2024-07-10 13:26:48.390 [main] INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-07-10 13:26:48.436 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 5.6.15.Final
+2024-07-10 13:26:48.528 [main] INFO  org.hibernate.annotations.common.Version - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2024-07-10 13:26:48.585 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-07-10 13:26:48.680 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-07-10 13:26:48.689 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.MySQL55Dialect
+2024-07-10 13:26:48.988 [main] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-07-10 13:26:48.995 [main] INFO  org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-07-10 13:26:49.282 [main] WARN  org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-07-10 13:26:51.126 [main] INFO  org.springframework.cloud.commons.util.InetUtils - Cannot determine local hostname
+2024-07-10 13:26:51.171 [main] INFO  org.springframework.cloud.netflix.eureka.config.DiscoveryClientOptionalArgsConfiguration - Eureka HTTP Client uses RestTemplate.
+2024-07-10 13:26:52.420 [main] INFO  org.springframework.cloud.commons.util.InetUtils - Cannot determine local hostname
+2024-07-10 13:26:52.490 [main] WARN  org.springframework.cloud.loadbalancer.config.LoadBalancerCacheAutoConfiguration$LoadBalancerCaffeineWarnLogger - Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2024-07-10 13:26:52.532 [main] INFO  org.springframework.cloud.netflix.eureka.InstanceInfoFactory - Setting initial instance status as: STARTING
+2024-07-10 13:26:52.557 [main] INFO  com.netflix.discovery.DiscoveryClient - Initializing Eureka in region us-east-1
+2024-07-10 13:26:52.559 [main] INFO  com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2024-07-10 13:26:52.573 [main] INFO  com.netflix.discovery.DiscoveryClient - Disable delta property : false
+2024-07-10 13:26:52.573 [main] INFO  com.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2024-07-10 13:26:52.573 [main] INFO  com.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2024-07-10 13:26:52.573 [main] INFO  com.netflix.discovery.DiscoveryClient - Application is null : false
+2024-07-10 13:26:52.573 [main] INFO  com.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2024-07-10 13:26:52.574 [main] INFO  com.netflix.discovery.DiscoveryClient - Application version is -1: true
+2024-07-10 13:26:52.574 [main] INFO  com.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2024-07-10 13:26:52.729 [main] INFO  com.netflix.discovery.DiscoveryClient - The response status is 200
+2024-07-10 13:26:52.731 [main] INFO  com.netflix.discovery.DiscoveryClient - Starting heartbeat executor: renew interval is: 30
+2024-07-10 13:26:52.733 [main] INFO  com.netflix.discovery.InstanceInfoReplicator - InstanceInfoReplicator onDemand update allowed rate per min is 4
+2024-07-10 13:26:52.738 [main] INFO  com.netflix.discovery.DiscoveryClient - Discovery Client initialized at timestamp 1720610812737 with initial instances count: 1
+2024-07-10 13:26:52.741 [main] INFO  org.springframework.cloud.netflix.eureka.serviceregistry.EurekaServiceRegistry - Registering application MAIL with eureka with status UP
+2024-07-10 13:26:52.741 [main] INFO  com.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1720610812741, current=UP, previous=STARTING]
+2024-07-10 13:26:52.743 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083: registering service...
+2024-07-10 13:26:52.743 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
+2024-07-10 13:26:52.761 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8083 (http) with context path '/email'
+2024-07-10 13:26:52.761 [main] INFO  org.springframework.cloud.netflix.eureka.serviceregistry.EurekaAutoServiceRegistration - Updating port to 8083
+2024-07-10 13:26:52.772 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083 - registration status: 204
+2024-07-10 13:26:53.959 [main] INFO  org.springframework.cloud.commons.util.InetUtils - Cannot determine local hostname
+2024-07-10 13:26:53.981 [main] INFO  com.example.mail.MailApplication - Started MailApplication in 9.806 seconds (JVM running for 10.888)
+2024-07-10 13:27:25.146 [http-nio-8083-exec-1] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/email] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-07-10 13:27:25.146 [http-nio-8083-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-07-10 13:27:25.147 [http-nio-8083-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2024-07-10 13:29:35.437 [SpringApplicationShutdownHook] INFO  org.springframework.cloud.netflix.eureka.serviceregistry.EurekaServiceRegistry - Unregistering application MAIL with eureka with status DOWN
+2024-07-10 13:29:35.438 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1720610975438, current=DOWN, previous=UP]
+2024-07-10 13:29:35.438 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083: registering service...
+2024-07-10 13:29:35.442 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083 - registration status: 204
+2024-07-10 13:29:35.587 [SpringApplicationShutdownHook] INFO  org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-07-10 13:29:35.587 [SpringApplicationShutdownHook] INFO  org.hibernate.tool.schema.internal.SchemaDropperImpl$DelayedDropActionImpl - HHH000477: Starting delayed evictData of schema as part of SessionFactory shut-down'
+2024-07-10 13:29:35.602 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-07-10 13:29:35.608 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-07-10 13:29:35.609 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - Shutting down DiscoveryClient ...
+2024-07-10 13:29:38.630 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - Unregistering ...
+2024-07-10 13:29:38.642 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083 - deregister  status: 200
+2024-07-10 13:29:38.648 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - Completed shut down of DiscoveryClient
+2024-07-10 13:29:45.142 [main] INFO  org.springframework.cloud.config.client.ConfigServicePropertySourceLocator - Fetching config from server at : http://localhost:8888
+2024-07-10 13:29:45.199 [main] INFO  org.springframework.cloud.config.client.ConfigServicePropertySourceLocator - Connect Timeout Exception on Url - http://localhost:8888. Will be trying the next url if available
+2024-07-10 13:29:45.200 [main] WARN  org.springframework.cloud.config.client.ConfigServicePropertySourceLocator - Could not locate PropertySource: I/O error on GET request for "http://localhost:8888/Mail/default": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+2024-07-10 13:29:45.201 [main] INFO  com.example.mail.MailApplication - No active profile set, falling back to 1 default profile: "default"
+2024-07-10 13:29:45.570 [main] INFO  org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-07-10 13:29:45.623 [main] INFO  org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 48 ms. Found 1 JPA repository interfaces.
+2024-07-10 13:29:45.793 [main] INFO  org.springframework.cloud.context.scope.GenericScope - BeanFactory id=14f02cf8-cd12-3760-b983-815d78678944
+2024-07-10 13:29:46.034 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8083 (http)
+2024-07-10 13:29:46.038 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8083"]
+2024-07-10 13:29:46.039 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2024-07-10 13:29:46.039 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.82]
+2024-07-10 13:29:46.158 [main] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/email] - Initializing Spring embedded WebApplicationContext
+2024-07-10 13:29:46.159 [main] INFO  org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 952 ms
+2024-07-10 13:29:46.316 [main] INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-07-10 13:29:46.342 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 5.6.15.Final
+2024-07-10 13:29:46.416 [main] INFO  org.hibernate.annotations.common.Version - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2024-07-10 13:29:46.474 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-07-10 13:29:46.565 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-07-10 13:29:46.574 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.MySQL55Dialect
+2024-07-10 13:29:46.868 [main] INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-07-10 13:29:46.874 [main] INFO  org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-07-10 13:29:47.118 [main] WARN  org.springframework.boot.autoconfigure.orm.jpa.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-07-10 13:29:48.933 [main] INFO  org.springframework.cloud.commons.util.InetUtils - Cannot determine local hostname
+2024-07-10 13:29:48.970 [main] INFO  org.springframework.cloud.netflix.eureka.config.DiscoveryClientOptionalArgsConfiguration - Eureka HTTP Client uses RestTemplate.
+2024-07-10 13:29:50.226 [main] INFO  org.springframework.cloud.commons.util.InetUtils - Cannot determine local hostname
+2024-07-10 13:29:50.284 [main] WARN  org.springframework.cloud.loadbalancer.config.LoadBalancerCacheAutoConfiguration$LoadBalancerCaffeineWarnLogger - Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2024-07-10 13:29:50.328 [main] INFO  org.springframework.cloud.netflix.eureka.InstanceInfoFactory - Setting initial instance status as: STARTING
+2024-07-10 13:29:50.350 [main] INFO  com.netflix.discovery.DiscoveryClient - Initializing Eureka in region us-east-1
+2024-07-10 13:29:50.352 [main] INFO  com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver - Resolving eureka endpoints via configuration
+2024-07-10 13:29:50.368 [main] INFO  com.netflix.discovery.DiscoveryClient - Disable delta property : false
+2024-07-10 13:29:50.368 [main] INFO  com.netflix.discovery.DiscoveryClient - Single vip registry refresh property : null
+2024-07-10 13:29:50.368 [main] INFO  com.netflix.discovery.DiscoveryClient - Force full registry fetch : false
+2024-07-10 13:29:50.368 [main] INFO  com.netflix.discovery.DiscoveryClient - Application is null : false
+2024-07-10 13:29:50.368 [main] INFO  com.netflix.discovery.DiscoveryClient - Registered Applications size is zero : true
+2024-07-10 13:29:50.368 [main] INFO  com.netflix.discovery.DiscoveryClient - Application version is -1: true
+2024-07-10 13:29:50.369 [main] INFO  com.netflix.discovery.DiscoveryClient - Getting all instance registry info from the eureka server
+2024-07-10 13:29:50.549 [main] INFO  com.netflix.discovery.DiscoveryClient - The response status is 200
+2024-07-10 13:29:50.551 [main] INFO  com.netflix.discovery.DiscoveryClient - Starting heartbeat executor: renew interval is: 30
+2024-07-10 13:29:50.553 [main] INFO  com.netflix.discovery.InstanceInfoReplicator - InstanceInfoReplicator onDemand update allowed rate per min is 4
+2024-07-10 13:29:50.556 [main] INFO  com.netflix.discovery.DiscoveryClient - Discovery Client initialized at timestamp 1720610990556 with initial instances count: 1
+2024-07-10 13:29:50.559 [main] INFO  org.springframework.cloud.netflix.eureka.serviceregistry.EurekaServiceRegistry - Registering application MAIL with eureka with status UP
+2024-07-10 13:29:50.560 [main] INFO  com.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1720610990560, current=UP, previous=STARTING]
+2024-07-10 13:29:50.561 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083: registering service...
+2024-07-10 13:29:50.561 [main] INFO  org.apache.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8083"]
+2024-07-10 13:29:50.577 [main] INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port(s): 8083 (http) with context path '/email'
+2024-07-10 13:29:50.578 [main] INFO  org.springframework.cloud.netflix.eureka.serviceregistry.EurekaAutoServiceRegistration - Updating port to 8083
+2024-07-10 13:29:50.591 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083 - registration status: 204
+2024-07-10 13:29:51.781 [main] INFO  org.springframework.cloud.commons.util.InetUtils - Cannot determine local hostname
+2024-07-10 13:29:51.794 [main] INFO  com.example.mail.MailApplication - Started MailApplication in 9.673 seconds (JVM running for 10.676)
+2024-07-10 13:29:56.795 [http-nio-8083-exec-1] INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/email] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-07-10 13:29:56.795 [http-nio-8083-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-07-10 13:29:56.796 [http-nio-8083-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2024-07-10 13:33:11.822 [SpringApplicationShutdownHook] INFO  org.springframework.cloud.netflix.eureka.serviceregistry.EurekaServiceRegistry - Unregistering application MAIL with eureka with status DOWN
+2024-07-10 13:33:11.822 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - Saw local status change event StatusChangeEvent [timestamp=1720611191822, current=DOWN, previous=UP]
+2024-07-10 13:33:11.822 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083: registering service...
+2024-07-10 13:33:11.831 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083 - registration status: 204
+2024-07-10 13:33:11.976 [SpringApplicationShutdownHook] INFO  org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-07-10 13:33:11.976 [SpringApplicationShutdownHook] INFO  org.hibernate.tool.schema.internal.SchemaDropperImpl$DelayedDropActionImpl - HHH000477: Starting delayed evictData of schema as part of SessionFactory shut-down'
+2024-07-10 13:33:11.990 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-07-10 13:33:12.002 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-07-10 13:33:12.003 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - Shutting down DiscoveryClient ...
+2024-07-10 13:33:15.018 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - Unregistering ...
+2024-07-10 13:33:15.033 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - DiscoveryClient_MAIL/localhost:Mail:8083 - deregister  status: 200
+2024-07-10 13:33:15.037 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient - Completed shut down of DiscoveryClient

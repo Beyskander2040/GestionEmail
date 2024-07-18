@@ -1,0 +1,49 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>From</th>
+            <th>Received Date</th>
+            <th>Content</th>
+            <th>Piéces Jointes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emailData of emails">
+            <td>{{ emailData.mail.subject }}</td>
+            <td>{{ emailData.mail.sender }}</td>
+            <td>{{ emailData.mail.receivedDate | date:'medium' }}</td>
+            <td (click)="toggleFullContent(emailData)">
+              <div *ngIf="!emailData.fullContentVisible">
+                <span matTooltip="{{ emailData.mail.content }}" matTooltipPosition="above" matTooltipClass="tooltip-content">
+                  {{ emailData.mail.content | slice:0:50 }}{{ emailData.mail.content.length > 50 ? '...' : '' }}
+                </span>
+              </div>
+              <div *ngIf="emailData.fullContentVisible" [innerHTML]="emailData.safeContent"></div>
+            </td>
+            <td>
+              <ul>
+                <li *ngFor="let attachment of emailData.mail.attachments">
+                  <a [href]="getAttachmentUrl(attachment)" download="{{attachment.filename}}">
+                    {{ attachment.filename }}
+                  </a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-auto">
+      <button class="btn btn-primary" (click)="loadMore()" *ngIf="!allEmailsLoaded && !loading">Load More</button>
+      <div *ngIf="loading">
+        <p>Loading more emails...</p>
+      </div>
+    </div>
+  </div>
+</div>
