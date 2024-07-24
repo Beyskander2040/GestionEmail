@@ -19,4 +19,12 @@ export class AuthGuard implements CanActivate {
     }
   }
   
+  getUserIdFromToken(): number | null {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      return decodedToken.userId;
+    }
+    return null;
+  }
 }

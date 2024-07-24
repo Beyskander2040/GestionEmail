@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.xml.registry.infomodel.User;
 import java.util.Date;
 import java.util.List;
 
@@ -22,6 +23,8 @@ public class Mail {
     @Column(length = 255)
     private String subject;
     private String sender;
+    private String userEmail; // Add this field
+
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
@@ -31,4 +34,10 @@ public class Mail {
     @OneToMany(mappedBy = "mail", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Attachment> attachments;
+    private Integer userId;
+
+    private Long mailboxId;
+
+
+
 }

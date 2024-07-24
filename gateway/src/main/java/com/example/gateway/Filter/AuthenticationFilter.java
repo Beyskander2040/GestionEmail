@@ -1,10 +1,12 @@
 package com.example.gateway.Filter;
 
 import com.example.gateway.Util.jwtUtil;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +32,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             }
 
             if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                throw new RuntimeException("missing authorization Header");
+                return Mono.error(new RuntimeException("missing authorization Header"));
             }
 
             String authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
@@ -39,15 +41,26 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             }
 
             try {
-                jwtUtil.validateToken(authHeader);
-            } catch (Exception e) {
-                System.out.println("invalid access");
-                throw new RuntimeException("unauthorized access to application");
-            }
+                Claims claims = jwtUtil.extractClaims(authHeader);
+                String username = claims.getSubject();
+                Integer userId = claims.get("userId", Integer.class);
 
-            return chain.filter(exchange);
+                if (username == null || userId == null) {
+                    return Mono.error(new RuntimeException("Missing claims in token"));
+                }
+
+                ServerHttpRequest request = exchange.getRequest().mutate()
+                        .header("UserId", userId.toString())
+                        .header("Username", username)
+                        .build();
+
+                return chain.filter(exchange.mutate().request(request).build());
+            } catch (Exception e) {
+                return Mono.error(new RuntimeException("Unauthorized access to application", e));
+            }
         };
     }
+
 
     public static class Config {
     }

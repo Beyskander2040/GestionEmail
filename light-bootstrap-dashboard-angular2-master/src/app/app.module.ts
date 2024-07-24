@@ -15,6 +15,12 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ListMailBoxComponent } from './list-mail-box/list-mail-box.component';
+import { LoginDialogComponent } from './login-dialog/login-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 
 
 @NgModule({
@@ -27,14 +33,20 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     FooterModule,
     SidebarModule,
     AppRoutingModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule
 
   ],
   declarations: [
     AppComponent,
     AdminLayoutComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    ListMailBoxComponent,
+    LoginDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

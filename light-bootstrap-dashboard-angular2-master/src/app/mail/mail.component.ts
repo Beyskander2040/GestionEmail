@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 import { Mail } from 'app/Models/mail';
 import { EmailService } from 'app/Services/email.service';
-
 
 @Component({
   selector: 'app-mail',
@@ -15,25 +15,48 @@ export class MailComponent implements OnInit {
   size: number = 10;
   loading: boolean = false;
   allEmailsLoaded: boolean = false;
+  email: string = ''; // Define email property
+  password: string = ''; // Define password property
 
-  constructor(private emailService: EmailService, private sanitizer: DomSanitizer) { }
+  constructor(
+    private emailService: EmailService,
+    private sanitizer: DomSanitizer,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
-    this.loadEmails(); // Initial load of emails
+    this.route.queryParams.subscribe(params => {
+      const emailData = params['emailData'];
+      if (emailData) {
+        this.emails = JSON.parse(emailData);
+        this.emails.forEach(emailData => {
+          emailData.safeContent = this.sanitizer.bypassSecurityTrustHtml(emailData.mail.content);
+          emailData.fullContentVisible = false;
+        });
+      }
+      this.email = params['email'] || '';
+      this.password = params['password'] || '';
+      this.page = parseInt(params['page'], 10) || 0;
+      this.size = parseInt(params['size'], 10) || 10;
+    });
   }
 
   loadEmails(): void {
     this.loading = true;
-    const offset = this.page * this.size; // Calculate offset based on page number
-    this.emailService.getEmails(offset, this.size).subscribe(
+    this.emailService.getEmails(
+      this.email,
+      this.password,
+      this.page,
+      this.size
+    ).subscribe(
       (data: Mail[]) => {
         if (data.length < this.size) {
-          this.allEmailsLoaded = true; // All emails have been loaded
+          this.allEmailsLoaded = true;
         }
         const emailsWithSafeContent = data.map(email => ({
           mail: email,
           safeContent: this.sanitizer.bypassSecurityTrustHtml(email.content),
-          fullContentVisible: false // Initially hide full content
+          fullContentVisible: false
         }));
         this.emails = [...this.emails, ...emailsWithSafeContent];
         this.loading = false;
@@ -50,12 +73,13 @@ export class MailComponent implements OnInit {
   }
 
   getAttachmentUrl(attachment: any): string {
-    // Adjust this method to generate the correct URL for downloading the attachment
     return `path_to_attachments/${attachment.filename}`;
   }
 
   loadMore(): void {
-    this.page++;
-    this.loadEmails();
+    if (!this.allEmailsLoaded && !this.loading) {
+      this.page++;
+      this.loadEmails();
+    }
   }
 }

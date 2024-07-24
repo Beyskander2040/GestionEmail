@@ -6,15 +6,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Builder
 @NoArgsConstructor
@@ -29,8 +28,20 @@ public class User implements UserDetails {
     private Integer id;
     private String firstname;
     private String lastname;
+
+    @Email
+    @NotEmpty
     private String email;
+    @NotEmpty
+    @Size(min = 8)
     private String password;
+
+    @ElementCollection
+    private List<String> additionalEmails = new ArrayList<>();
+
+
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

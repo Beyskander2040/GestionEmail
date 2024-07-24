@@ -1,5 +1,6 @@
 package com.example.user.Config;
 
+import com.example.user.Entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -26,7 +27,9 @@ public class jwtService implements JwtInterface{
         return extractClaim(token, Claims::getSubject);
     }
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", ((User) userDetails).getId()); // Assuming you have a getId() method in User
+        return generateToken(extraClaims, userDetails);
     }
     public String generateToken(
             Map<String, Object> extraClaims,

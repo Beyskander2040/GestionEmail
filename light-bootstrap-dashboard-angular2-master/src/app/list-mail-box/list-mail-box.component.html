@@ -1,0 +1,25 @@
+<div class="container mt-4">
+    <!-- Table View for Mailboxes -->
+    <div class="mt-4">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Email Address</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mailbox of mailboxes" (click)="onSelectMailbox(mailbox)" style="cursor: pointer;">
+            <td>{{ mailbox.emailAddress }}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" (click)="onDeleteMailbox(mailbox, $event)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Add Mailbox Button -->
+    <button class="btn btn-primary mt-3" (click)="onAddMailbox()">Add Mailbox</button>
+  </div>
+  
