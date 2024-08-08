@@ -40,27 +40,7 @@ public class AuthControlleur {
 
     }
 
-//    @GetMapping("/email-credentials")
-//    public ResponseEntity<List<EmailCredential>> fetchEmailCredentials(@RequestParam("email") String email) {
-//        // Retrieve user from user repository
-//        Optional<User> optionalUser = iuserRepository.findByEmail(email);
-//        if (optionalUser.isEmpty()) {
-//            // Handle case where user with given username/email does not exist
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        User user = optionalUser.get();
-//
-//        // Retrieve email credentials from authentication service
-//        List<EmailCredential> credentials = authenticationService.getEmailCredentials(email);
-//        if (credentials.isEmpty()) {
-//            // Handle case where no email credentials are found
-//            return ResponseEntity.noContent().build();
-//        }
-//
-//        // Return successful response with email credentials
-//        return ResponseEntity.ok(credentials);
-//    }
+
 
 
     @PostMapping("/{userId}/additional-emails")

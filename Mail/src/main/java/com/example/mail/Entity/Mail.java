@@ -34,7 +34,7 @@ public class Mail {
     @OneToMany(mappedBy = "mail", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Attachment> attachments;
-    private Integer userId;
+
 
     private Long mailboxId;
 

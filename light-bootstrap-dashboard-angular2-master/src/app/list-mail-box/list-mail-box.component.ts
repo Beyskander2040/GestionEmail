@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { AddMailboxDialogComponent } from 'app/add-mailbox-dialog/add-mailbox-dialog.component';
 import { LoginDialogComponent } from 'app/login-dialog/login-dialog.component';
 import { Mailbox } from 'app/Models/mailbox';
+import { ProgressDialogComponent } from 'app/progress-dialog/progress-dialog.component';
 import { MailBoxService } from 'app/Services/mail-box.service';
 import { jwtDecode } from 'jwt-decode';
 
@@ -17,6 +19,8 @@ export class ListMailBoxComponent implements OnInit {
   email: string = '';
   password: string = '';
   error: string | null = null;
+  progress: number = 0;
+  isCreatingMailbox: boolean = false;
 
   constructor(
     private mailboxService: MailBoxService,
@@ -25,20 +29,8 @@ export class ListMailBoxComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userId = this.getUserIdFromToken();
-    if (userId) {
-      this.mailboxService.getMailboxes(userId).subscribe(
-        data => {
-          this.mailboxes = data;
-        },
-        error => {
-          this.error = 'Failed to load mailboxes';
-          console.error('Error:', error);
-        }
-      );
-    } else {
-      this.error = 'User ID not found in token';
-    }
+    this.loadMailboxes();
+    this.progress = 50;
   }
 
   private getUserIdFromToken(): number | null {
@@ -55,6 +47,23 @@ export class ListMailBoxComponent implements OnInit {
     return null;
   }
 
+  private loadMailboxes(): void {
+    const userId = this.getUserIdFromToken();
+    if (userId) {
+      this.mailboxService.getMailboxes(userId).subscribe(
+        data => {
+          this.mailboxes = data;
+        },
+        error => {
+          this.error = 'Failed to load mailboxes';
+          console.error('Error:', error);
+        }
+      );
+    } else {
+      this.error = 'User ID not found in token';
+    }
+  }
+
   onSelectMailbox(mailbox: Mailbox): void {
     this.selectedMailbox = mailbox;
     const dialogRef = this.dialog.open(LoginDialogComponent, {
@@ -69,19 +78,79 @@ export class ListMailBoxComponent implements OnInit {
         this.router.navigate(['/Mail'], {
           queryParams: {
             email: this.email,
-            password: this.password
+            password: this.password,
+            emailData: JSON.stringify(result.emails)
           }
         });
       }
     });
   }
-  onDeleteMailbox(mailbox: Mailbox): void {
-    // Placeholder for delete functionality
-    console.log('Delete mailbox:', mailbox);
+
+  onDeleteMailbox(mailboxId: number, event: Event): void {
+    event.stopPropagation(); // Prevent triggering row click
+    if (confirm('Are you sure you want to delete this mailbox?')) {
+      this.mailboxService.deleteMailbox(mailboxId).subscribe(
+        () => {
+          // Successfully deleted mailbox, refresh the list
+          this.loadMailboxes();
+        },
+        error => {
+          this.error = 'Failed to delete mailbox';
+          console.error('Error:', error);
+        }
+      );
+    }
   }
-  
+
   onAddMailbox(): void {
-    // Placeholder for add functionality
-    console.log('Add new mailbox');
+    const dialogRef = this.dialog.open(AddMailboxDialogComponent, {
+      width: '300px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const { email, password } = result;
+        const userId = this.getUserIdFromToken();
+        if (userId) {
+          const progressDialogRef = this.dialog.open(ProgressDialogComponent, {
+            width: '400px',
+            data: { progress: 0 }
+          });
+
+          this.mailboxService.createMailbox(email, password).subscribe(
+            response => {
+              this.loadMailboxes(); // Refresh mailboxes after adding
+
+              const newMailboxId = response.body?.id; // Adjust based on your response structure
+              if (newMailboxId) {
+                this.trackProgress(newMailboxId, progressDialogRef);
+              } else {
+                this.error = 'Mailbox ID not found in response';
+                progressDialogRef.close();
+              }
+            },
+            error => {
+              this.error = 'Failed to create mailbox. Please check your credentials.';
+              progressDialogRef.close();
+            }
+          );
+        }
+      }
+    });
   }
+
+  trackProgress(mailboxId: number, progressDialogRef: any): void {
+    this.mailboxService.getProgress(mailboxId).subscribe(
+      (progress: number) => {
+        progressDialogRef.componentInstance.progress = progress;
+        if (progress === 100) {
+          progressDialogRef.close();
+        }
+      },
+      error => {
+        progressDialogRef.close();
+      }
+    );
+  }
+
 }

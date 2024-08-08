@@ -1,25 +1,35 @@
+<!-- list-mail-box.component.html -->
 <div class="container mt-4">
-    <!-- Table View for Mailboxes -->
-    <div class="mt-4">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Email Address</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let mailbox of mailboxes" (click)="onSelectMailbox(mailbox)" style="cursor: pointer;">
-            <td>{{ mailbox.emailAddress }}</td>
-            <td>
-              <button class="btn btn-danger btn-sm" (click)="onDeleteMailbox(mailbox, $event)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  
-    <!-- Add Mailbox Button -->
-    <button class="btn btn-primary mt-3" (click)="onAddMailbox()">Add Mailbox</button>
+  <!-- Table View for Mailboxes -->
+  <div class="mt-4">
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Email Address</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let mailbox of mailboxes" (click)="onSelectMailbox(mailbox)" style="cursor: pointer;">
+          <td>{{ mailbox.emailAddress }}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" (click)="onDeleteMailbox(mailbox.id, $event)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  
+
+  <!-- Add Mailbox Button -->
+  <button class="btn btn-primary mt-3" (click)="onAddMailbox()">Add Mailbox</button>
+
+  <!-- Progress Bar at the bottom -->
+  <div *ngIf="isCreatingMailbox" class="progress-container">
+    <div class="progress-bar-wrapper">
+      <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+      <div class="progress-text">{{ progress }}%</div>
+    </div>
+  </div>
+</div>

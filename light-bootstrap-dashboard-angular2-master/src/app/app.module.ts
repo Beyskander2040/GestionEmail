@@ -20,7 +20,10 @@ import { LoginDialogComponent } from './login-dialog/login-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
+import { AddMailboxDialogComponent } from './add-mailbox-dialog/add-mailbox-dialog.component';
+import { ProgressDialogComponent } from './progress-dialog/progress-dialog.component';
 
 
 @NgModule({
@@ -37,7 +40,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatProgressBarModule
 
   ],
   declarations: [
@@ -46,7 +50,9 @@ import { MatButtonModule } from '@angular/material/button';
     LoginComponent,
     RegisterComponent,
     ListMailBoxComponent,
-    LoginDialogComponent
+    LoginDialogComponent,
+    AddMailboxDialogComponent,
+    ProgressDialogComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

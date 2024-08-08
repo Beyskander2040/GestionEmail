@@ -1,12 +1,15 @@
 package com.example.mail.Service;
 
+import com.example.mail.Controlleur.MailControlleur;
 import com.example.mail.Entity.Attachment;
+import com.example.mail.Entity.EmailDTO;
 import com.example.mail.Entity.Mail;
 import com.example.mail.Repository.IAttachmentRepository;
 import com.example.mail.Repository.IMailRepository;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -21,13 +24,19 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.search.FlagTerm;
+import javax.validation.constraints.Email;
+
 import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
 @Service
@@ -45,11 +54,11 @@ public class EmailService implements IEmailService {
     @Autowired
     private RestTemplate restTemplate;
 
-//    public List<Mail> getEmails(int page, int size) {
-//        Pageable pageable = PageRequest.of(page, size);
-//        Page<Mail> emailPage = emailRepository.findAll(pageable);
-//        return emailPage.getContent();
-//    }
+    private SseEmitter emitter;
+    private final Object emitterLock = new Object();
+    private boolean isEmitterClosed = false;
+
+
 
     @Override
     public Page<Mail> getEmails(int page, int size) {
@@ -128,85 +137,7 @@ public class EmailService implements IEmailService {
         return emailRepository.findByUserEmail(userEmail);
     }
 
-    @Override
-    public List<Mail> getEmailsByUserId(Integer userId) {
-        return emailRepository.findByUserId(userId);
-    }
 
-    public List<Mail> findByUserEmail(String userEmail) {
-        return emailRepository.findByUserEmail(userEmail);
-    }
-    @Override
-    @Async
-    public void readAndSaveEmailsForMailbox(String userEmail, String userPassword, Integer userId) {
-        logger.info("readAndSaveEmails method called for user: {}", userEmail);
-
-        Properties properties = new Properties();
-        properties.put("mail.store.protocol", "imaps");
-        properties.put("mail.imaps.host", "imap.gmail.com");
-        properties.put("mail.imaps.port", "993");
-        properties.put("mail.imaps.ssl.enable", "true");
-
-        Session emailSession = Session.getDefaultInstance(properties);
-        Store store = null;
-        try {
-            logger.info("Attempting to connect to the email server...");
-            store = emailSession.getStore("imaps");
-            store.connect("imap.gmail.com", userEmail, userPassword);
-            logger.info("Successfully connected to the email server.");
-        } catch (Exception e) {
-            logger.error("Error connecting to email server: " + e.getMessage());
-            return;
-        }
-
-        Folder emailFolder = null;
-        try {
-            emailFolder = store.getFolder("INBOX");
-            emailFolder.open(Folder.READ_ONLY);
-
-            logger.info("Fetching unseen emails...");
-            Message[] messages = emailFolder.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
-            for (Message message : messages) {
-                Mail email = new Mail();
-                email.setSubject(message.getSubject());
-                email.setSender(message.getFrom()[0].toString());
-                email.setReceivedDate(message.getReceivedDate());
-                email.setUserId(userId);
-
-                Object content = message.getContent();
-                if (content instanceof String) {
-                    email.setContent((String) content);
-                } else if (content instanceof MimeMultipart) {
-                    MimeMultipart multipart = (MimeMultipart) content;
-                    email.setContent(extractContentFromMultipart(multipart));
-
-                    List<Attachment> attachments = extractAttachmentsFromMultipart(multipart);
-                    for (Attachment attachment : attachments) {
-                        attachment.setMail(email);
-                    }
-                    email.setAttachments(attachments);
-                } else {
-                    email.setContent("Unsupported content type");
-                }
-
-                logger.info("Saving email: " + email.getSubject());
-                emailRepository.save(email);
-            }
-        } catch (Exception e) {
-            logger.error("Error reading or saving emails: " + e.getMessage());
-        } finally {
-            try {
-                if (emailFolder != null) {
-                    emailFolder.close(false);
-                }
-                if (store != null) {
-                    store.close();
-                }
-            } catch (MessagingException e) {
-                logger.error("Error closing email folder or store: " + e.getMessage());
-            }
-        }
-    }
 
 
 
@@ -270,13 +201,16 @@ public class EmailService implements IEmailService {
 
         return emails;
     }
+    private void updateProgress(Long mailboxId, int progress) {
+        MailControlleur.progressMap.put(mailboxId, progress);
+    }
+
 
 
     @Async
     @Override
-    public void readAndSaveEmails33(Long mailboxId, String userEmail, String userPassword) {
-        logger.info("readAndSaveEmails33 method called for mailboxId: {}", mailboxId);
 
+    public void readAndSaveEmails33(Long mailboxId, String email, String password) {
         Properties properties = new Properties();
         properties.put("mail.store.protocol", "imaps");
         properties.put("mail.imaps.host", "imap.gmail.com");
@@ -285,72 +219,82 @@ public class EmailService implements IEmailService {
 
         Session emailSession = Session.getDefaultInstance(properties);
         Store store = null;
-        try {
-            logger.info("Attempting to connect to the email server...");
-            store = emailSession.getStore("imaps");
-            store.connect("imap.gmail.com", userEmail, userPassword);
-            logger.info("Successfully connected to the email server.");
-        } catch (Exception e) {
-            logger.error("Error connecting to email server: " + e.getMessage());
-            return;
-        }
-
         Folder emailFolder = null;
+
         try {
+            store = emailSession.getStore("imaps");
+            store.connect("imap.gmail.com", email, password);
+
             emailFolder = store.getFolder("INBOX");
             emailFolder.open(Folder.READ_ONLY);
 
-            logger.info("Fetching unseen emails...");
-            Message[] messages = emailFolder.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
-            for (Message message : messages) {
-                Mail email = new Mail();
-                email.setSubject(message.getSubject());
-                email.setSender(message.getFrom()[0].toString());
-                email.setReceivedDate(message.getReceivedDate());
-                email.setMailboxId(mailboxId); // Set the mailboxId
+            Message[] messages = emailFolder.getMessages();
+            int totalMessages = messages.length;
 
-                Object content = message.getContent();
-                if (content instanceof String) {
-                    email.setContent((String) content);
-                } else if (content instanceof MimeMultipart) {
-                    MimeMultipart multipart = (MimeMultipart) content;
-                    email.setContent(extractContentFromMultipart(multipart));
-
-                    List<Attachment> attachments = extractAttachmentsFromMultipart(multipart);
-                    email.setAttachments(new ArrayList<>());
-                    for (Attachment attachment : attachments) {
-                        attachment.setMail(email);
-                        email.getAttachments().add(attachment);
-                    }
-                } else {
-                    email.setContent("Unsupported content type");
-                }
-
-                logger.info("Saving email: " + email.getSubject());
-                emailRepository.save(email); // Save the Mail entity first
-
-                // Save the attachments after saving the email
-                if(email.getAttachments() != null && !email.getAttachments().isEmpty()) {
-                    for (Attachment attachment : email.getAttachments()) {
-                        attachmentRepository.save(attachment);
-                    }
+            for (int i = 0; i < messages.length; i++) {
+                processAndSaveEmail(messages[i], mailboxId);
+                // Update progress every 10 emails
+                if ((i + 1) % 10 == 0 || (i + 1) == totalMessages) {
+                    int progress = (i + 1) * 100 / totalMessages;
+                    updateProgress(mailboxId, progress);
                 }
             }
+
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("Error reading or saving emails: " + e.getMessage());
+            // Handle exceptions
         } finally {
             try {
-                if (emailFolder != null) {
-                    emailFolder.close(false);
-                }
-                if (store != null) {
-                    store.close();
-                }
-            } catch (MessagingException e) {
-                logger.error("Error closing email folder or store: " + e.getMessage());
+                if (emailFolder != null) emailFolder.close(false);
+                if (store != null) store.close();
+            } catch (Exception e) {
+                // Handle exceptions
             }
         }
+    }
+    public SseEmitter getProgressEmitter() {
+        synchronized (emitterLock) {
+            emitter = new SseEmitter();
+            isEmitterClosed = false; // Reset flag when a new emitter is created
+        }
+        return emitter;
+    }
+
+
+    private Mail processAndSaveEmail(Message message, Long mailboxId) throws Exception {
+        Mail email = new Mail();
+        email.setSubject(message.getSubject());
+        email.setSender(message.getFrom()[0].toString());
+        email.setReceivedDate(message.getReceivedDate());
+        email.setMailboxId(mailboxId); // Set the mailboxId
+
+        Object content = message.getContent();
+        if (content instanceof String) {
+            email.setContent((String) content);
+        } else if (content instanceof MimeMultipart) {
+            MimeMultipart multipart = (MimeMultipart) content;
+            email.setContent(extractContentFromMultipart(multipart));
+
+            List<Attachment> attachments = extractAttachmentsFromMultipart(multipart);
+            email.setAttachments(new ArrayList<>());
+            for (Attachment attachment : attachments) {
+                attachment.setMail(email);
+                email.getAttachments().add(attachment);
+            }
+        } else {
+            email.setContent("Unsupported content type");
+        }
+
+        logger.info("Saving email: " + email.getSubject());
+        emailRepository.save(email); // Save the Mail entity first
+
+        // Save the attachments after saving the email
+        if (email.getAttachments() != null && !email.getAttachments().isEmpty()) {
+            for (Attachment attachment : email.getAttachments()) {
+                attachmentRepository.save(attachment);
+            }
+        }
+
+        return email;
     }
 
     @Override
@@ -414,6 +358,65 @@ public class EmailService implements IEmailService {
             } catch (MessagingException e) {
                 logger.error("Error closing store: " + e.getMessage());
             }
+        }
+
+        return emails;
+    }
+    public List<EmailDTO> fetchAndReturnEmails(String userEmail, String userPassword) {
+        // Logic to fetch emails from the mail server
+        List<Mail> emails = fetchEmailsFromServer(userEmail, userPassword);
+
+        // Convert to DTO
+        return emails.stream().map(email -> {
+            EmailDTO dto = new EmailDTO();
+            BeanUtils.copyProperties(email, dto);
+            return dto;
+        }).collect(Collectors.toList());
+    }
+    @Override
+    public List<Mail> fetchEmailsabc(String email, String password, int page, int size) {
+        List<Mail> emails = new ArrayList<>();
+
+        // Set up the properties for the IMAP connection
+        Properties properties = new Properties();
+        properties.put("mail.store.protocol", "imaps");
+        properties.put("mail.imap.host", "imap.yourmailserver.com"); // Replace with your mail server
+        properties.put("mail.imap.port", "993"); // Typically used for IMAP over SSL
+
+        try {
+            // Create a session with the mail server
+            Session session = Session.getInstance(properties, null);
+            Store store = session.getStore("imaps");
+            store.connect(email, password);
+
+            // Open the inbox folder
+            Folder inbox = store.getFolder("INBOX");
+            inbox.open(Folder.READ_ONLY);
+
+            // Get the message count and determine the range for pagination
+            int messageCount = inbox.getMessageCount();
+            int start = Math.max(0, messageCount - ((page + 1) * size));
+            int end = Math.min(messageCount, start + size);
+
+            // Fetch the messages in the specified range
+            Message[] messages = inbox.getMessages(start + 1, end);
+            for (Message message : messages) {
+                Mail mail = new Mail();
+                mail.setSubject(message.getSubject());
+                mail.setSender(((MimeMessage) message).getFrom()[0].toString());
+                mail.setContent(message.getContent().toString());
+                mail.setReceivedDate(message.getReceivedDate());
+                // Set any other fields you need
+
+                emails.add(mail);
+            }
+
+            // Close connections
+            inbox.close(false);
+            store.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle exceptions appropriately
         }
 
         return emails;

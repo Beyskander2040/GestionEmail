@@ -44,14 +44,11 @@ export class LoginDialogComponent {
         this.emails = [...this.emails, ...emailsWithSafeContent];
         this.loading = false;
 
-        // Close the dialog and navigate to MailComponent with email, password, and email data
-        this.dialogRef.close();
-        this.router.navigate(['/Mail'], {
-          queryParams: {
-            email: this.email,
-            password: this.password,
-            emailData: JSON.stringify(emailsWithSafeContent)
-          }
+        // Close the dialog and return email, password, and email data
+        this.dialogRef.close({
+          email: this.email,
+          password: this.password,
+          emails: emailsWithSafeContent
         });
       },
       (error) => {

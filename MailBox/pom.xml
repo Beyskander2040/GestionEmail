@@ -21,9 +21,10 @@
     <dependencies>
         <dependency>
             <groupId>com.example</groupId>
-            <artifactId>Mail</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <artifactId>mail</artifactId>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
+
         <!-- Spring Boot dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
