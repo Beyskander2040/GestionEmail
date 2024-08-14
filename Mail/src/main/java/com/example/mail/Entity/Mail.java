@@ -23,9 +23,7 @@ public class Mail {
     @Column(length = 255)
     private String subject;
     private String sender;
-    private String userEmail; // Add this field
-
-
+    private String userEmail;
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     private String content;
@@ -34,10 +32,9 @@ public class Mail {
     @OneToMany(mappedBy = "mail", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Attachment> attachments;
-
-
     private Long mailboxId;
-
+    @Column(nullable = false, unique = true)
+    private String uid;
 
 
 }

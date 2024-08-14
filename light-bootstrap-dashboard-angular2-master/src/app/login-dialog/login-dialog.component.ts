@@ -26,35 +26,50 @@ export class LoginDialogComponent {
     private router: Router
   ) {
     this.email = data.emailAddress;
+    this.password = data.password;
   }
 
   onNoClick(): void {
     this.dialogRef.close();
   }
 
-  onFetchEmails(): void {
+  onFetchEmails(mailboxId: number): void {
     this.loading = true;
-    this.emailService.getEmails(this.email, this.password, this.page, this.size).subscribe(
-      (data: Mail[]) => {
-        const emailsWithSafeContent = data.map(email => ({
-          mail: email,
-          safeContent: this.sanitizer.bypassSecurityTrustHtml(email.content),
-          fullContentVisible: false
-        }));
-        this.emails = [...this.emails, ...emailsWithSafeContent];
-        this.loading = false;
-
-        // Close the dialog and return email, password, and email data
-        this.dialogRef.close({
-          email: this.email,
-          password: this.password,
-          emails: emailsWithSafeContent
-        });
+    
+    console.log('Starting new emails check...');
+    this.emailService.checkNewEmails(this.email, this.password, mailboxId).subscribe(
+      () => {
+        console.log('New emails check succeeded.');
+        console.log('Fetching all emails...');
+        this.emailService.getEmailsForMailbox(mailboxId).subscribe(
+          (data: Mail[]) => {
+            console.log('Emails fetched:', data);
+            const emailsWithSafeContent = data.map(email => ({
+              mail: email,
+              safeContent: this.sanitizer.bypassSecurityTrustHtml(email.content),
+              fullContentVisible: false
+            }));
+            this.emails = [...this.emails, ...emailsWithSafeContent];
+            this.loading = false;
+            this.dialogRef.close({
+              email: this.email,
+              password: this.password,
+              emails: emailsWithSafeContent,
+              mailboxId: mailboxId
+            });
+          },
+          (error) => {
+            console.error('Error fetching emails:', error);
+            this.loading = false;
+          }
+        );
       },
       (error) => {
-        console.error('Error fetching emails:', error);
+        console.error('Error checking new emails:', error);
         this.loading = false;
       }
     );
   }
+  
+  
 }

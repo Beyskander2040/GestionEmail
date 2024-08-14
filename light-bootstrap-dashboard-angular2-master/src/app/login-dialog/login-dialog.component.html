@@ -1,17 +1,17 @@
-<h2 mat-dialog-title>Connecter a votre boite Mail: {{ data.emailAddress }}</h2>
+<h2 mat-dialog-title>Connecter à votre boite Mail: {{ data.emailAddress }}</h2>
 <mat-dialog-content>
-  <form (ngSubmit)="onFetchEmails()">
+  <form (ngSubmit)="onFetchEmails(data.mailboxId)">
     <mat-form-field>
       <mat-label>Email</mat-label>
       <input matInput [(ngModel)]="email" name="email" required>
     </mat-form-field>
     <mat-form-field>
-      <mat-label>Mot de passe </mat-label>
+      <mat-label>Mot de passe</mat-label>
       <input matInput type="password" [(ngModel)]="password" name="password" required>
     </mat-form-field>
-    <button mat-raised-button color="primary" type="submit">connecter</button>
+    <button mat-raised-button color="primary" type="submit">Connecter</button>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">annuler</button>
+  <button mat-button (click)="onNoClick()">Annuler</button>
 </mat-dialog-actions>

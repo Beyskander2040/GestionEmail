@@ -5,6 +5,7 @@ import { AddMailboxDialogComponent } from 'app/add-mailbox-dialog/add-mailbox-di
 import { LoginDialogComponent } from 'app/login-dialog/login-dialog.component';
 import { Mailbox } from 'app/Models/mailbox';
 import { ProgressDialogComponent } from 'app/progress-dialog/progress-dialog.component';
+import { EmailService } from 'app/Services/email.service';
 import { MailBoxService } from 'app/Services/mail-box.service';
 import { jwtDecode } from 'jwt-decode';
 
@@ -24,6 +25,8 @@ export class ListMailBoxComponent implements OnInit {
 
   constructor(
     private mailboxService: MailBoxService,
+    private mailservice: EmailService,
+
     private router: Router,
     public dialog: MatDialog
   ) {}
@@ -63,28 +66,33 @@ export class ListMailBoxComponent implements OnInit {
       this.error = 'User ID not found in token';
     }
   }
-
   onSelectMailbox(mailbox: Mailbox): void {
     this.selectedMailbox = mailbox;
     const dialogRef = this.dialog.open(LoginDialogComponent, {
       width: '300px',
-      data: { emailAddress: mailbox.emailAddress }
+      data: { emailAddress: mailbox.emailAddress,password:mailbox.password, mailboxId: mailbox.id }
     });
-
+  
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        console.log('Dialog closed with result:', result);
         this.email = result.email;
         this.password = result.password;
         this.router.navigate(['/Mail'], {
           queryParams: {
             email: this.email,
             password: this.password,
-            emailData: JSON.stringify(result.emails)
+            mailboxId: result.mailboxId
           }
+        }).then(() => {
+          console.log('Navigated to MailComponent');
+        }).catch(err => {
+          console.error('Navigation error:', err);
         });
       }
     });
   }
+  
 
   onDeleteMailbox(mailboxId: number, event: Event): void {
     event.stopPropagation(); // Prevent triggering row click

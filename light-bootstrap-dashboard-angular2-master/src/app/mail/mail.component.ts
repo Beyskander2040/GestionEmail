@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Mail } from 'app/Models/mail';
@@ -10,55 +12,39 @@ import { EmailService } from 'app/Services/email.service';
   styleUrls: ['./mail.component.scss']
 })
 export class MailComponent implements OnInit {
-  emails: { mail: Mail, safeContent: SafeHtml, fullContentVisible: boolean }[] = [];
-  page: number = 0;
-  size: number = 10;
+  emails: MatTableDataSource<Mail> = new MatTableDataSource();
+  displayedColumns: string[] = ['subject', 'from', 'receivedDate', 'content', 'attachments'];
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   loading: boolean = false;
-  allEmailsLoaded: boolean = false;
-  email: string = ''; // Define email property
-  password: string = ''; // Define password property
 
   constructor(
     private emailService: EmailService,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      const emailData = params['emailData'];
-      if (emailData) {
-        this.emails = JSON.parse(emailData);
-        this.emails.forEach(emailData => {
-          emailData.safeContent = this.sanitizer.bypassSecurityTrustHtml(emailData.mail.content);
-          emailData.fullContentVisible = false;
-        });
+      const mailboxId = params['mailboxId'];
+      if (mailboxId) {
+        this.loadAllEmails(mailboxId);
       }
-      this.email = params['email'] || '';
-      this.password = params['password'] || '';
-      this.page = parseInt(params['page'], 10) || 0;
-      this.size = parseInt(params['size'], 10) || 10;
     });
   }
 
-  loadEmails(): void {
+  ngAfterViewInit(): void {
+    this.emails.paginator = this.paginator;
+  }
+
+  loadAllEmails(mailboxId: number): void {
     this.loading = true;
-    this.emailService.getEmails(
-      this.email,
-      this.password,
-      this.page,
-      this.size
-    ).subscribe(
+    this.emailService.getEmailsForMailbox(mailboxId).subscribe(
       (data: Mail[]) => {
-        if (data.length < this.size) {
-          this.allEmailsLoaded = true;
-        }
-        const emailsWithSafeContent = data.map(email => ({
-          mail: email,
+        this.emails.data = data.map(email => ({
+          ...email,
           safeContent: this.sanitizer.bypassSecurityTrustHtml(email.content),
           fullContentVisible: false
         }));
-        this.emails = [...this.emails, ...emailsWithSafeContent];
         this.loading = false;
       },
       (error) => {
@@ -68,18 +54,11 @@ export class MailComponent implements OnInit {
     );
   }
 
-  toggleFullContent(emailData: { mail: Mail, safeContent: SafeHtml, fullContentVisible: boolean }): void {
-    emailData.fullContentVisible = !emailData.fullContentVisible;
-  }
+  // toggleFullContent(emailData: Mail): void {
+  //   emailData.fullContentVisible = !emailData.fullContentVisible;
+  // }
 
   getAttachmentUrl(attachment: any): string {
     return `path_to_attachments/${attachment.filename}`;
-  }
-
-  loadMore(): void {
-    if (!this.allEmailsLoaded && !this.loading) {
-      this.page++;
-      this.loadEmails();
-    }
   }
 }

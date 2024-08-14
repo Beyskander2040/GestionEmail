@@ -21,6 +21,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import javax.validation.constraints.NotBlank;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("api/v1/emails")
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class MailControlleur {
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private static final Logger logger = LogManager.getLogger(MailControlleur.class);
@@ -134,9 +136,31 @@ public class MailControlleur {
         return emitter;
     }
 
-
-
-
+    @PostMapping("/check")
+    public ResponseEntity<String> checkNewEmails(
+            @RequestParam  String email,
+            @RequestParam  String password,
+            @RequestParam Long mailboxId) {
+        try {
+            emailService.checkAndLogNewEmails(email, password, mailboxId);
+            return ResponseEntity.ok("Email check completed successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error checking emails: " + e.getMessage());
+        }
+    }
+    @GetMapping("/all")
+    public ResponseEntity<List<Mail>> getAllEmails(
+            @RequestParam Long mailboxId) {
+        if (mailboxId == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            List<Mail> emails = emailService.findByMailboxId(mailboxId);
+            return ResponseEntity.ok(emails);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }
 
 

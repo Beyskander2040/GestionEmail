@@ -20,24 +20,35 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import javax.mail.*;
+import javax.mail.internet.MimeMultipart;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.annotation.PostConstruct;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.mail.search.ComparisonTerm;
 import javax.mail.search.FlagTerm;
+import javax.mail.search.ReceivedDateTerm;
+import javax.mail.search.SearchTerm;
 import javax.validation.constraints.Email;
 
 import org.springframework.http.HttpMethod;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.io.InputStream;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
+import javax.mail.UIDFolder;
+import javax.mail.Folder;
 
 @Service
 public class EmailService implements IEmailService {
@@ -46,13 +57,10 @@ public class EmailService implements IEmailService {
     @Autowired
     private IAttachmentRepository attachmentRepository ;
 
-    @Autowired
-    private JavaMailSender mailSender;
 
     @Autowired
     private IMailRepository emailRepository;
-    @Autowired
-    private RestTemplate restTemplate;
+
 
     private SseEmitter emitter;
     private final Object emitterLock = new Object();
@@ -422,6 +430,180 @@ public class EmailService implements IEmailService {
         return emails;
     }
 
+    @Override
+    public List<Mail> findByMailboxId(Long mailboxId) {
+        return emailRepository.findByMailboxId(mailboxId);
+    }
+    public void checkAndLogNewEmails(String email, String password, Long mailboxId) {
+        Date mostRecentEmailDate = emailRepository.findMostRecentEmailDateByMailboxId(mailboxId);
+        logger.debug("Starting checkAndLogNewEmails method.");
+        logger.debug("Most recent email date from database: {}", mostRecentEmailDate);
+
+        List<Mail> newEmails = fetchNewEmails(email, password, mostRecentEmailDate, mailboxId);
+
+        boolean newEmailsFound = false;
+        for (Mail newEmail : newEmails) {
+            if (newEmail.getUid() == null) {
+                logger.warn("Email with null UID encountered: {}", newEmail);
+                continue;
+            }
+
+            Optional<Mail> existingEmail = emailRepository.findByUidAndMailboxId(newEmail.getUid(), mailboxId);
+            if (existingEmail.isEmpty()) {
+                emailRepository.save(newEmail);
+                logger.debug("Saved email with UID {} to the database.", newEmail.getUid());
+                newEmailsFound = true;
+            } else {
+                logger.debug("Email with UID {} already exists in the database.", newEmail.getUid());
+            }
+        }
+
+        if (newEmailsFound) {
+            logger.info("New emails found:");
+            for (Mail mail : newEmails) {
+                System.out.println("Subject: " + mail.getSubject());
+                System.out.println("From: " + mail.getSender());
+                System.out.println("Received Date: " + mail.getReceivedDate());
+                System.out.println("Content: " + mail.getContent());
+                System.out.println("----------");
+            }
+        } else {
+            logger.info("No new emails.");
+        }
+    }
+
+
+
+    private List<Mail> fetchNewEmails(String email, String password, Date mostRecentEmailDate, Long mailboxId) {
+        logger.debug("Starting fetchNewEmails method.");
+        Properties properties = new Properties();
+        properties.put("mail.store.protocol", "imaps");
+        properties.put("mail.imap.host", "imap.gmail.com"); // Replace with your server
+        properties.put("mail.imap.port", "993"); // Default IMAP SSL port
+
+        Session session = Session.getInstance(properties);
+        List<Mail> newEmails = new ArrayList<>();
+
+        try {
+            Store store = session.getStore("imaps");
+            store.connect("imap.gmail.com", email, password);
+
+            Folder inbox = store.getFolder("INBOX");
+            inbox.open(Folder.READ_ONLY);
+
+            logger.debug("Connected to mail server and opened inbox.");
+
+            // Fetch messages received after the most recent email date
+            SearchTerm searchTerm = new ReceivedDateTerm(ComparisonTerm.GT, mostRecentEmailDate);
+            Message[] messages = inbox.search(searchTerm);
+
+            logger.debug("Fetched {} messages from the server.", messages.length);
+
+            // Process and convert messages to your Mail objects using IMAP UID
+            newEmails = processMessages(messages, inbox, mailboxId);
+
+            inbox.close(false);
+            store.close();
+        } catch (MessagingException e) {
+            logger.error("Error while fetching new emails.", e);
+        }
+
+        return newEmails;
+    }
+
+    private List<Mail> processMessages(Message[] messages, Folder inbox, Long mailboxId) {
+        logger.debug("Starting processMessages method.");
+        List<Mail> emailList = new ArrayList<>();
+
+        if (inbox instanceof UIDFolder) {
+            UIDFolder uidFolder = (UIDFolder) inbox;
+
+            for (Message message : messages) {
+                try {
+                    long uid = uidFolder.getUID(message);
+
+                    Mail mail = new Mail();
+                    mail.setUid(String.valueOf(uid));
+                    mail.setSubject(message.getSubject());
+                    mail.setSender(((InternetAddress) message.getFrom()[0]).getAddress());
+                    mail.setContent(extractContent(message)); // Use the extractContent method
+                    mail.setReceivedDate(message.getReceivedDate());
+                    mail.setMailboxId(mailboxId);
+
+                    emailList.add(mail);
+
+                    logger.debug("Processed email with UID {}.", mail.getUid());
+                } catch (Exception e) {
+                    logger.error("Error while processing message.", e);
+                }
+            }
+        } else {
+            logger.error("Folder does not support UID operations.");
+        }
+
+        return emailList;
+    }
+
+
+
+    @PostConstruct
+    public void updateExistingMails() {
+        Iterable<Mail> mailIterable = emailRepository.findAll();
+        List<Mail> mails = StreamSupport.stream(mailIterable.spliterator(), false)
+                .collect(Collectors.toList());
+        for (Mail mail : mails) {
+            if (mail.getUid() == null) {
+                mail.setUid(generateUniqueUid());
+                emailRepository.save(mail);
+            }
+        }
+    }
+
+    private String generateUniqueUid() {
+        return UUID.randomUUID().toString();
+    }
+    public String extractContent(Message message) throws MessagingException {
+        try {
+            Object content = message.getContent();
+            if (content instanceof String) {
+                return (String) content;
+            } else if (content instanceof MimeMultipart) {
+                return extractContentFromMultipart((MimeMultipart) content);
+            }
+            return "Unsupported content type";
+        } catch (IOException e) {
+            throw new MessagingException("Error accessing message content", e);
+        }
+    }
+
+    private String extractContentFromMultipart(MimeMultipart multipart) throws MessagingException {
+        StringBuilder contentBuilder = new StringBuilder();
+        try {
+            for (int i = 0; i < multipart.getCount(); i++) {
+                BodyPart bodyPart = multipart.getBodyPart(i);
+                Object bodyContent = bodyPart.getContent();
+
+                if (bodyContent instanceof String) {
+                    contentBuilder.append((String) bodyContent);
+                } else if (bodyContent instanceof InputStream) {
+                    try (InputStream inputStream = (InputStream) bodyContent;
+                         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = inputStream.read(buffer)) != -1) {
+                            outputStream.write(buffer, 0, bytesRead);
+                        }
+                        contentBuilder.append(outputStream.toString());
+                    } catch (IOException e) {
+                        throw new MessagingException("Error reading content from InputStream", e);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new MessagingException("Error processing multipart content", e);
+        }
+        return contentBuilder.toString();
+    }
 }
 
 

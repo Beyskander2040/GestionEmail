@@ -27,7 +27,7 @@ public interface IEmailService {
     List<Mail> fetchEmails(String userEmail, String userPassword, int page, int size);
     List<EmailDTO> fetchAndReturnEmails(String userEmail, String userPassword);
     public List<Mail> fetchEmailsabc(String email, String password, int page, int size);
-//    void handleProgressEmitter(int  progressPercentage);
-     SseEmitter getProgressEmitter() ;
 
+    List<Mail> findByMailboxId(Long mailboxId);
+    void checkAndLogNewEmails(String email, String password, Long mailboxId);
 }

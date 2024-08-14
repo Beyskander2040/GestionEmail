@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Mail } from 'app/Models/mail';
 import { Page } from 'app/Models/page';
 import { catchError, Observable, tap, throwError } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 
 @Injectable({
   providedIn: 'root'
@@ -49,8 +51,50 @@ export class EmailService {
         })
       );
   }
+  checkNewEmails(email: string, password: string, mailboxId: number): Observable<any> {
+    const url = `${this.apiUrl}/check?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&mailboxId=${mailboxId}`;
+    const token = localStorage.getItem('authToken');
+  
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  
+    return this.http.post(url, null, { headers, responseType: 'text' })  // Expect text response
+      .pipe(
+        map(response => {
+          // Handle the response text here if needed
+          return response;
+        }),
+        catchError(err => {
+          console.error('Error checking new emails', err);
+          return throwError(err);
+        })
+      );
+  }
+  
+
 
   
+getEmailsForMailbox(mailboxId: number): Observable<Mail[]> {
+  const url = `${this.apiUrl}/all?mailboxId=${mailboxId}`;
+  const token = localStorage.getItem('authToken');
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  });
+
+  return this.http.get<Mail[]>(url, { headers })
+    .pipe(
+      catchError(err => {
+        console.error('Error fetching emails for mailbox', err);
+        return throwError(err);
+      })
+    );
+}
+
+
+
 
 
 }
