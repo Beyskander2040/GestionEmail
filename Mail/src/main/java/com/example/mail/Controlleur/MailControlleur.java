@@ -1,6 +1,5 @@
 package com.example.mail.Controlleur;
 
-import com.example.mail.Entity.EmailDTO;
 import com.example.mail.Entity.Mail;
 import com.example.mail.Repository.IMailRepository;
 import com.example.mail.Service.IEmailService;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,13 +19,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import javax.validation.constraints.NotBlank;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-
 @RestController
 @RequestMapping("api/v1/emails")
 //@CrossOrigin(origins = "*")
@@ -47,34 +38,6 @@ public class MailControlleur {
 
     @Autowired
     private IEmailService emailService;
-
-
-    @GetMapping("/emails")
-    public ResponseEntity<List<Mail>> getEmails(
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        logger.info("Fetching emails with pagination - page: {}, size: {}", page, size);
-
-        List<Mail> emails = emailService.fetchEmails(email, password, page, size);
-
-        return ResponseEntity.ok(emails);
-    }
-
-
-    @PostMapping("/login")
-    public ResponseEntity<List<EmailDTO>> loginAndFetchEmails(@RequestParam String userEmail, @RequestParam String userPassword) {
-        List<EmailDTO> emails = emailService.fetchAndReturnEmails(userEmail, userPassword);
-        if (emails != null) {
-            return ResponseEntity.ok(emails);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
-
-
     @PostMapping("/fetch")
     public ResponseEntity<String> fetchEmails(
             @RequestParam Long mailboxId,
@@ -97,6 +60,7 @@ public class MailControlleur {
 
         return ResponseEntity.ok("Email fetching started.");
     }
+    @CrossOrigin(origins = "*")
     @GetMapping("/progress/{mailboxId}")
     public SseEmitter getProgressEmitter(@PathVariable Long mailboxId) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE); // Set a very long timeout
@@ -138,13 +102,14 @@ public class MailControlleur {
 
     @PostMapping("/check")
     public ResponseEntity<String> checkNewEmails(
-            @RequestParam  String email,
-            @RequestParam  String password,
+            @RequestParam String email,
+            @RequestParam String password,
             @RequestParam Long mailboxId) {
         try {
             emailService.checkAndLogNewEmails(email, password, mailboxId);
             return ResponseEntity.ok("Email check completed successfully.");
         } catch (Exception e) {
+            logger.error("Error checking emails", e);  // Enhanced logging
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error checking emails: " + e.getMessage());
         }
     }

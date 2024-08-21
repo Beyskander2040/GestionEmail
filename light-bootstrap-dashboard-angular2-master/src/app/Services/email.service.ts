@@ -60,10 +60,9 @@ export class EmailService {
       'Content-Type': 'application/json'
     });
   
-    return this.http.post(url, null, { headers, responseType: 'text' })  // Expect text response
+    return this.http.post(url, null, { headers, responseType: 'text' }) 
       .pipe(
         map(response => {
-          // Handle the response text here if needed
           return response;
         }),
         catchError(err => {
@@ -76,7 +75,7 @@ export class EmailService {
 
 
   
-getEmailsForMailbox(mailboxId: number): Observable<Mail[]> {
+  getEmailsForMailbox(mailboxId: number): Observable<Mail[]> {
   const url = `${this.apiUrl}/all?mailboxId=${mailboxId}`;
   const token = localStorage.getItem('authToken');
   const headers = new HttpHeaders({

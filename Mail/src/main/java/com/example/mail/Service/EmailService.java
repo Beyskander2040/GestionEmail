@@ -2,93 +2,42 @@ package com.example.mail.Service;
 
 import com.example.mail.Controlleur.MailControlleur;
 import com.example.mail.Entity.Attachment;
-import com.example.mail.Entity.EmailDTO;
 import com.example.mail.Entity.Mail;
 import com.example.mail.Repository.IAttachmentRepository;
 import com.example.mail.Repository.IMailRepository;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import jakarta.mail.search.ComparisonTerm;
+import jakarta.mail.search.ReceivedDateTerm;
+import jakarta.mail.search.SearchTerm;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import javax.mail.*;
-import javax.mail.internet.MimeMultipart;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+
 import javax.annotation.PostConstruct;
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.search.ComparisonTerm;
-import javax.mail.search.FlagTerm;
-import javax.mail.search.ReceivedDateTerm;
-import javax.mail.search.SearchTerm;
-import javax.validation.constraints.Email;
-
-import org.springframework.http.HttpMethod;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import javax.mail.UIDFolder;
-import javax.mail.Folder;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 
 @Service
 public class EmailService implements IEmailService {
-
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
     @Autowired
-    private IAttachmentRepository attachmentRepository ;
-
-
+    private IAttachmentRepository attachmentRepository;
     @Autowired
     private IMailRepository emailRepository;
 
-
-    private SseEmitter emitter;
-    private final Object emitterLock = new Object();
-    private boolean isEmitterClosed = false;
-
-
-
-    @Override
-    public Page<Mail> getEmails(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return emailRepository.findAll(pageable);
-    }
-
-
-    private String extractContentFromMultipart(Multipart multipart) throws MessagingException, IOException {
-        StringBuilder content = new StringBuilder();
-        for (int i = 0; i < multipart.getCount(); i++) {
-            BodyPart bodyPart = multipart.getBodyPart(i);
-            if (bodyPart.isMimeType("text/plain")) {
-                content.append(bodyPart.getContent());
-            } else if (bodyPart.isMimeType("text/html")) {
-                content.append(bodyPart.getContent());
-            } else if (bodyPart.getContent() instanceof Multipart) {
-                content.append(extractContentFromMultipart((Multipart) bodyPart.getContent()));
-            }
-        }
-        return content.toString();
-    }
 
     private List<Attachment> extractAttachmentsFromMultipart(MimeMultipart multipart) throws MessagingException, IOException {
         List<Attachment> attachments = new ArrayList<>();
@@ -98,19 +47,18 @@ public class EmailService implements IEmailService {
                 Attachment attachment = new Attachment();
                 attachment.setFilename(bodyPart.getFileName());
                 attachment.setContentType(bodyPart.getContentType());
-                attachment.setData(IOUtils.toByteArray(bodyPart.getInputStream())); // Example using Apache Commons IO
+                attachment.setData(IOUtils.toByteArray(bodyPart.getInputStream()));
                 attachments.add(attachment);
-            } else if (bodyPart.getContent() instanceof Multipart) {
+            } else if (bodyPart.getContent() instanceof MimeMultipart) {
                 attachments.addAll(extractAttachmentsFromMultipart((MimeMultipart) bodyPart.getContent()));
             }
         }
         return attachments;
     }
 
-
     @Async
     @Override
-    public boolean  readAndSaveEmails1(String userEmail, String userPassword) {
+    public boolean readAndSaveEmails1(String userEmail, String userPassword) {
         logger.info("Validating credentials for user: {}", userEmail);
 
         Properties properties = new Properties();
@@ -126,10 +74,10 @@ public class EmailService implements IEmailService {
             store = emailSession.getStore("imaps");
             store.connect("imap.gmail.com", userEmail, userPassword);
             logger.info("Successfully connected to the email server.");
-            return true; // Credentials are valid
+            return true;
         } catch (Exception e) {
             logger.error("Error connecting to email server: " + e.getMessage());
-            return false; // Invalid credentials
+            return false;
         } finally {
             if (store != null) {
                 try {
@@ -140,55 +88,45 @@ public class EmailService implements IEmailService {
             }
         }
     }
+
     @Override
     public List<Mail> getEmailsByUserEmail(String userEmail) {
         return emailRepository.findByUserEmail(userEmail);
     }
 
-
-
-
-
     public void readAndSaveEmailsforeachMailBox(String userEmail, String userPassword, Long mailboxId) {
-        // Logic to read emails
         List<Mail> emails = fetchEmailsFromServer(userEmail, userPassword);
 
-        // Set mailboxId for each email
         for (Mail email : emails) {
             email.setMailboxId(mailboxId);
         }
 
-        // Save emails
         emailRepository.saveAll(emails);
     }
+
     private List<Mail> fetchEmailsFromServer(String userEmail, String userPassword) {
         List<Mail> emails = new ArrayList<>();
 
         try {
-            // Set mail properties
             Properties properties = new Properties();
             properties.put("mail.store.protocol", "imaps");
             properties.put("mail.imaps.host", "imap.gmail.com");
             properties.put("mail.imaps.port", "993");
             properties.put("mail.imaps.ssl.trust", "*");
 
-            // Create session and store
             Session emailSession = Session.getDefaultInstance(properties);
-            Store store = emailSession.getStore();
+            Store store = emailSession.getStore("imaps");
             store.connect("imap.gmail.com", userEmail, userPassword);
 
-            // Open inbox folder
             Folder emailFolder = store.getFolder("INBOX");
             emailFolder.open(Folder.READ_ONLY);
 
-            // Fetch messages
             Message[] messages = emailFolder.getMessages();
 
             for (Message message : messages) {
                 if (message instanceof MimeMessage) {
                     MimeMessage mimeMessage = (MimeMessage) message;
 
-                    // Create Mail entity from MimeMessage
                     Mail mail = new Mail();
                     mail.setSubject(mimeMessage.getSubject());
                     mail.setSender(((InternetAddress) mimeMessage.getFrom()[0]).getAddress());
@@ -199,7 +137,6 @@ public class EmailService implements IEmailService {
                 }
             }
 
-            // Close connections
             emailFolder.close(false);
             store.close();
 
@@ -209,16 +146,16 @@ public class EmailService implements IEmailService {
 
         return emails;
     }
+
     private void updateProgress(Long mailboxId, int progress) {
         MailControlleur.progressMap.put(mailboxId, progress);
     }
 
-
-
     @Async
     @Override
-
     public void readAndSaveEmails33(Long mailboxId, String email, String password) {
+        Logger logger = LoggerFactory.getLogger(getClass());
+
         Properties properties = new Properties();
         properties.put("mail.store.protocol", "imaps");
         properties.put("mail.imaps.host", "imap.gmail.com");
@@ -230,6 +167,7 @@ public class EmailService implements IEmailService {
         Folder emailFolder = null;
 
         try {
+            logger.info("Connecting to email server with email: {}", email);
             store = emailSession.getStore("imaps");
             store.connect("imap.gmail.com", email, password);
 
@@ -239,203 +177,61 @@ public class EmailService implements IEmailService {
             Message[] messages = emailFolder.getMessages();
             int totalMessages = messages.length;
 
+            logger.info("Total messages to process: {}", totalMessages);
+
+            // Create a thread pool to process emails concurrently
+            int threadCount = 10; // Adjust the number of threads according to your needs
+            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+            AtomicInteger processedCount = new AtomicInteger(0);
+
             for (int i = 0; i < messages.length; i++) {
-                processAndSaveEmail(messages[i], mailboxId);
-                // Update progress every 10 emails
-                if ((i + 1) % 10 == 0 || (i + 1) == totalMessages) {
-                    int progress = (i + 1) * 100 / totalMessages;
-                    updateProgress(mailboxId, progress);
-                }
+                final int index = i; // Must be final or effectively final to be used in the lambda
+                executor.submit(() -> {
+                    try {
+                        logger.debug("Processing email {} of {}", index + 1, totalMessages);
+                        processAndSaveEmail(messages[index], mailboxId);
+
+                        // Update progress
+                        int processed = processedCount.incrementAndGet();
+                        if (processed % 10 == 0 || processed == totalMessages) {
+                            int progress = processed * 100 / totalMessages;
+                            logger.info("Updating progress: {}% for mailbox ID: {}", progress, mailboxId);
+                            updateProgress(mailboxId, progress);
+                        }
+                    } catch (Exception e) {
+                        logger.error("Error processing email {} of {}: ", index + 1, totalMessages, e);
+                    }
+                });
             }
 
+            // Shutdown the executor and wait for all threads to complete
+            executor.shutdown();
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+
+            logger.info("Email processing completed for mailbox ID: {}", mailboxId);
+
         } catch (Exception e) {
-            // Handle exceptions
+            logger.error("Error during email fetching: ", e);
         } finally {
             try {
                 if (emailFolder != null) emailFolder.close(false);
                 if (store != null) store.close();
             } catch (Exception e) {
-                // Handle exceptions
+                logger.error("Error closing email folder or store: ", e);
             }
         }
     }
-    public SseEmitter getProgressEmitter() {
-        synchronized (emitterLock) {
-            emitter = new SseEmitter();
-            isEmitterClosed = false; // Reset flag when a new emitter is created
-        }
-        return emitter;
-    }
-
-
-    private Mail processAndSaveEmail(Message message, Long mailboxId) throws Exception {
-        Mail email = new Mail();
-        email.setSubject(message.getSubject());
-        email.setSender(message.getFrom()[0].toString());
-        email.setReceivedDate(message.getReceivedDate());
-        email.setMailboxId(mailboxId); // Set the mailboxId
-
-        Object content = message.getContent();
-        if (content instanceof String) {
-            email.setContent((String) content);
-        } else if (content instanceof MimeMultipart) {
-            MimeMultipart multipart = (MimeMultipart) content;
-            email.setContent(extractContentFromMultipart(multipart));
-
-            List<Attachment> attachments = extractAttachmentsFromMultipart(multipart);
-            email.setAttachments(new ArrayList<>());
-            for (Attachment attachment : attachments) {
-                attachment.setMail(email);
-                email.getAttachments().add(attachment);
-            }
-        } else {
-            email.setContent("Unsupported content type");
-        }
-
-        logger.info("Saving email: " + email.getSubject());
-        emailRepository.save(email); // Save the Mail entity first
-
-        // Save the attachments after saving the email
-        if (email.getAttachments() != null && !email.getAttachments().isEmpty()) {
-            for (Attachment attachment : email.getAttachments()) {
-                attachmentRepository.save(attachment);
-            }
-        }
-
-        return email;
-    }
-
-    @Override
-    public List<Mail> fetchEmails( String userEmail, String userPassword, int page, int size) {
-        logger.info("fetchEmails method called for mailboxId: {}, page: {}, size: {}", page, size);
-
-        Properties properties = new Properties();
-        properties.put("mail.store.protocol", "imaps");
-        properties.put("mail.imaps.host", "imap.gmail.com");
-        properties.put("mail.imaps.port", "993");
-        properties.put("mail.imaps.ssl.enable", "true");
-
-        Session emailSession = Session.getDefaultInstance(properties);
-        Store store = null;
-        List<Mail> emails = new ArrayList<>();
-
-        try {
-            logger.info("Attempting to connect to the email server...");
-            store = emailSession.getStore("imaps");
-            store.connect("imap.gmail.com", userEmail, userPassword);
-            logger.info("Successfully connected to the email server.");
-
-            Folder emailFolder = store.getFolder("INBOX");
-            emailFolder.open(Folder.READ_ONLY);
-
-            logger.info("Fetching unseen emails...");
-            Message[] messages = emailFolder.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
-
-            int start = page * size;
-            int end = Math.min(start + size, messages.length);
-
-            for (int i = start; i < end; i++) {
-                Message message = messages[i];
-                Mail email = new Mail();
-                email.setSubject(message.getSubject());
-                email.setSender(message.getFrom()[0].toString());
-                email.setReceivedDate(message.getReceivedDate());
-
-
-                Object content = message.getContent();
-                if (content instanceof String) {
-                    email.setContent((String) content);
-                } else if (content instanceof MimeMultipart) {
-                    MimeMultipart multipart = (MimeMultipart) content;
-                    email.setContent(extractContentFromMultipart(multipart));
-                    // Attachments are not processed here
-                } else {
-                    email.setContent("Unsupported content type");
-                }
-
-                // Do not save the email to the database
-                emails.add(email);
-            }
-        } catch (Exception e) {
-            logger.error("Error fetching emails: " + e.getMessage());
-        } finally {
-            try {
-                if (store != null) {
-                    store.close();
-                }
-            } catch (MessagingException e) {
-                logger.error("Error closing store: " + e.getMessage());
-            }
-        }
-
-        return emails;
-    }
-    public List<EmailDTO> fetchAndReturnEmails(String userEmail, String userPassword) {
-        // Logic to fetch emails from the mail server
-        List<Mail> emails = fetchEmailsFromServer(userEmail, userPassword);
-
-        // Convert to DTO
-        return emails.stream().map(email -> {
-            EmailDTO dto = new EmailDTO();
-            BeanUtils.copyProperties(email, dto);
-            return dto;
-        }).collect(Collectors.toList());
-    }
-    @Override
-    public List<Mail> fetchEmailsabc(String email, String password, int page, int size) {
-        List<Mail> emails = new ArrayList<>();
-
-        // Set up the properties for the IMAP connection
-        Properties properties = new Properties();
-        properties.put("mail.store.protocol", "imaps");
-        properties.put("mail.imap.host", "imap.yourmailserver.com"); // Replace with your mail server
-        properties.put("mail.imap.port", "993"); // Typically used for IMAP over SSL
-
-        try {
-            // Create a session with the mail server
-            Session session = Session.getInstance(properties, null);
-            Store store = session.getStore("imaps");
-            store.connect(email, password);
-
-            // Open the inbox folder
-            Folder inbox = store.getFolder("INBOX");
-            inbox.open(Folder.READ_ONLY);
-
-            // Get the message count and determine the range for pagination
-            int messageCount = inbox.getMessageCount();
-            int start = Math.max(0, messageCount - ((page + 1) * size));
-            int end = Math.min(messageCount, start + size);
-
-            // Fetch the messages in the specified range
-            Message[] messages = inbox.getMessages(start + 1, end);
-            for (Message message : messages) {
-                Mail mail = new Mail();
-                mail.setSubject(message.getSubject());
-                mail.setSender(((MimeMessage) message).getFrom()[0].toString());
-                mail.setContent(message.getContent().toString());
-                mail.setReceivedDate(message.getReceivedDate());
-                // Set any other fields you need
-
-                emails.add(mail);
-            }
-
-            // Close connections
-            inbox.close(false);
-            store.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Handle exceptions appropriately
-        }
-
-        return emails;
-    }
-
     @Override
     public List<Mail> findByMailboxId(Long mailboxId) {
         return emailRepository.findByMailboxId(mailboxId);
     }
+
     public void checkAndLogNewEmails(String email, String password, Long mailboxId) {
         Date mostRecentEmailDate = emailRepository.findMostRecentEmailDateByMailboxId(mailboxId);
+        if (mostRecentEmailDate == null) {
+            logger.warn("Most recent email date is null for mailboxId: {}", mailboxId);
+            // Handle null case or set a default date if needed
+        }
         logger.debug("Starting checkAndLogNewEmails method.");
         logger.debug("Most recent email date from database: {}", mostRecentEmailDate);
 
@@ -471,9 +267,6 @@ public class EmailService implements IEmailService {
             logger.info("No new emails.");
         }
     }
-
-
-
     private List<Mail> fetchNewEmails(String email, String password, Date mostRecentEmailDate, Long mailboxId) {
         logger.debug("Starting fetchNewEmails method.");
         Properties properties = new Properties();
@@ -510,7 +303,6 @@ public class EmailService implements IEmailService {
 
         return newEmails;
     }
-
     private List<Mail> processMessages(Message[] messages, Folder inbox, Long mailboxId) {
         logger.debug("Starting processMessages method.");
         List<Mail> emailList = new ArrayList<>();
@@ -543,9 +335,55 @@ public class EmailService implements IEmailService {
 
         return emailList;
     }
+    public String extractContent(Message message) throws MessagingException {
+        try {
+            Object content = message.getContent();
+            if (content instanceof String) {
+                return (String) content;
+            } else if (content instanceof MimeMultipart) {
+                return extractContentFromMultipart((MimeMultipart) content);
+            }
+            return "Unsupported content type";
+        } catch (IOException e) {
+            throw new MessagingException("Error accessing message content", e);
+        }
+    }
+    private Mail processAndSaveEmail(Message message, Long mailboxId) throws Exception {
+        Mail email = new Mail();
+        email.setSubject(message.getSubject());
+        email.setSender(message.getFrom()[0].toString());
+        email.setReceivedDate(message.getReceivedDate());
+        email.setMailboxId(mailboxId); // Set the mailboxId
 
+        Object content = message.getContent();
+        if (content instanceof String) {
+            email.setContent((String) content);
+        } else if (content instanceof MimeMultipart) {
+            MimeMultipart multipart = (MimeMultipart) content;
+            email.setContent(extractContentFromMultipart(multipart));
 
+            List<Attachment> attachments = extractAttachmentsFromMultipart(multipart);
+            email.setAttachments(new ArrayList<>());
+            for (Attachment attachment : attachments) {
+                attachment.setMail(email);
+                email.getAttachments().add(attachment);
+            }
+        } else {
+            email.setContent("Unsupported content type");
+        }
 
+        logger.info("Saving email: " + email.getSubject());
+        emailRepository.save(email); // Save the Mail entity first
+
+        // Save the attachments after saving the email
+        if (email.getAttachments() != null && !email.getAttachments().isEmpty()) {
+            for (Attachment attachment : email.getAttachments()) {
+                attachmentRepository.save(attachment);
+            }
+        }
+
+        return email;
+    }
     @PostConstruct
     public void updateExistingMails() {
         Iterable<Mail> mailIterable = emailRepository.findAll();
@@ -562,49 +400,51 @@ public class EmailService implements IEmailService {
     private String generateUniqueUid() {
         return UUID.randomUUID().toString();
     }
-    public String extractContent(Message message) throws MessagingException {
-        try {
-            Object content = message.getContent();
-            if (content instanceof String) {
-                return (String) content;
-            } else if (content instanceof MimeMultipart) {
-                return extractContentFromMultipart((MimeMultipart) content);
-            }
-            return "Unsupported content type";
-        } catch (IOException e) {
-            throw new MessagingException("Error accessing message content", e);
-        }
-    }
 
-    private String extractContentFromMultipart(MimeMultipart multipart) throws MessagingException {
-        StringBuilder contentBuilder = new StringBuilder();
-        try {
-            for (int i = 0; i < multipart.getCount(); i++) {
-                BodyPart bodyPart = multipart.getBodyPart(i);
-                Object bodyContent = bodyPart.getContent();
+    private String extractContentFromMultipart(MimeMultipart multipart) throws MessagingException, IOException {
+        StringBuilder content = new StringBuilder();
 
-                if (bodyContent instanceof String) {
-                    contentBuilder.append((String) bodyContent);
-                } else if (bodyContent instanceof InputStream) {
-                    try (InputStream inputStream = (InputStream) bodyContent;
-                         ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                        byte[] buffer = new byte[1024];
-                        int bytesRead;
-                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, bytesRead);
-                        }
-                        contentBuilder.append(outputStream.toString());
-                    } catch (IOException e) {
-                        throw new MessagingException("Error reading content from InputStream", e);
+        for (int i = 0; i < multipart.getCount(); i++) {
+            BodyPart part = multipart.getBodyPart(i);
+            String contentType = part.getContentType().toLowerCase();
+
+            if (contentType.contains("text/plain") || contentType.contains("text/html")) {
+                String charsetName = getCharset(part.getContentType());
+                try (InputStream inputStream = part.getInputStream();
+                     Reader reader = new InputStreamReader(inputStream, charsetName)) {
+                    content.append(new BufferedReader(reader).lines().collect(Collectors.joining("\n")));
+                } catch (UnsupportedEncodingException e) {
+                    logger.error("Unsupported encoding: " + charsetName + ". Fallback to UTF-8.", e);
+                    // Fallback to UTF-8
+                    try (InputStream inputStream = part.getInputStream();
+                         Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+                        content.append(new BufferedReader(reader).lines().collect(Collectors.joining("\n")));
                     }
                 }
+            } else if (part.getContent() instanceof MimeMultipart) {
+                content.append(extractContentFromMultipart((MimeMultipart) part.getContent()));
             }
-        } catch (IOException e) {
-            throw new MessagingException("Error processing multipart content", e);
         }
-        return contentBuilder.toString();
+
+        return content.length() > 0 ? content.toString() : "No content found";
     }
+
+    private String getCharset(String contentType) {
+        try {
+            ContentType ct = new ContentType(contentType);
+            String charset = ct.getParameter("charset");
+
+            if ("unicode-1-1-utf-7".equalsIgnoreCase(charset)) {
+                return StandardCharsets.UTF_8.name(); // Fallback to UTF-8 if charset is unsupported
+            }
+            return charset != null ? charset : StandardCharsets.UTF_8.name();
+        } catch (ParseException e) {
+            return StandardCharsets.UTF_8.name(); // Fallback to UTF-8 in case of parsing error
+        }
+    }
+
 }
+
 
 
 

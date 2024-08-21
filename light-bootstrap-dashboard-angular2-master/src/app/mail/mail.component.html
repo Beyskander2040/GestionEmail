@@ -1,61 +1,46 @@
 <div class="container-fluid">
+  <div class="container-fluid">
   <div class="row">
     <div class="col">
-      <table mat-table [dataSource]="emails" class="mat-elevation-z8 table table-striped">
-        <!-- Subject Column -->
-        <ng-container matColumnDef="subject">
-          <th mat-header-cell *matHeaderCellDef> Subject </th>
-          <td mat-cell *matCellDef="let emailData"> {{ emailData.subject }} </td>
-        </ng-container>
-
-        <!-- From Column -->
-        <ng-container matColumnDef="from">
-          <th mat-header-cell *matHeaderCellDef> From </th>
-          <td mat-cell *matCellDef="let emailData"> {{ emailData.sender }} </td>
-        </ng-container>
-
-        <!-- Received Date Column -->
-        <ng-container matColumnDef="receivedDate">
-          <th mat-header-cell *matHeaderCellDef> Received Date </th>
-          <td mat-cell *matCellDef="let emailData"> {{ emailData.receivedDate | date:'medium' }} </td>
-        </ng-container>
-
-        <!-- Content Column -->
-        <ng-container matColumnDef="content">
-          <th mat-header-cell *matHeaderCellDef> Content </th>
-          <td mat-cell *matCellDef="let emailData" (click)="toggleFullContent(emailData)">
-            <div *ngIf="!emailData.fullContentVisible">
-              <span matTooltip="{{ emailData.content }}" matTooltipPosition="above" matTooltipClass="tooltip-content">
-                {{ emailData.content | slice:0:50 }}{{ emailData.content.length > 50 ? '...' : '' }}
-              </span>
-            </div>
-            <div *ngIf="emailData.fullContentVisible" [innerHTML]="emailData.safeContent"></div>
-          </td>
-        </ng-container>
-
-        <!-- Attachments Column -->
-        <ng-container matColumnDef="attachments">
-          <th mat-header-cell *matHeaderCellDef> Attachments </th>
-          <td mat-cell *matCellDef="let emailData">
-            <ul>
-              <li *ngFor="let attachment of emailData.attachments">
-                <a [href]="getAttachmentUrl(attachment)" download="{{attachment.filename}}">
-                  {{ attachment.filename }}
-                </a>
-              </li>
-            </ul>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>From</th>
+            <th>Received Date</th>
+            <th>Content</th>
+            <th>Piéces Jointes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emailData of emails">
+            <td>{{ emailData.subject }}</td>
+            <td>{{ emailData.sender }}</td>
+            <td>{{ emailData.receivedDate | date:'medium' }}</td>
+            <td (click)="toggleFullContent(emailData)">
+              <div *ngIf="!emailData.fullContentVisible">
+                <span matTooltip="{{ emailData.content }}" matTooltipPosition="above" matTooltipClass="tooltip-content">
+                  {{ emailData.content | slice:0:50 }}{{ emailData.content.length > 50 ? '...' : '' }}
+                </span>
+              </div>
+              <div *ngIf="emailData.fullContentVisible" [innerHTML]="emailData.safeContent"></div>
+            </td>
+            <td>
+              <ul>
+                <li *ngFor="let attachment of emailData.attachments">
+                  <a [href]="getAttachmentUrl(attachment)" download="{{attachment.filename}}">
+                    {{ attachment.filename }}
+                  </a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          
+        </tbody>
       </table>
-      <mat-paginator 
-      [length]="totalLength" 
-      [pageSize]="pageSize" 
-      [pageSizeOptions]="[5, 10, 25, 50]" 
-      showFirstLastButtons>
-    </mat-paginator>
-        </div>
+    </div>
   </div>
-</div>
+  <div class="row justify-content-center">
+    <div class="col-auto">
+      <!-- <button class="btn btn-primary" (click)="loadMore()" *ngIf="!allEmailsLoaded && !loading">Load More</button> -->
+      <div *ngIf="loading">

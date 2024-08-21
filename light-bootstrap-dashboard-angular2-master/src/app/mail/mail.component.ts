@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Mail } from 'app/Models/mail';
@@ -12,7 +11,7 @@ import { EmailService } from 'app/Services/email.service';
   styleUrls: ['./mail.component.scss']
 })
 export class MailComponent implements OnInit {
-  emails: MatTableDataSource<Mail> = new MatTableDataSource();
+  emails: Mail[] = [];
   displayedColumns: string[] = ['subject', 'from', 'receivedDate', 'content', 'attachments'];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   loading: boolean = false;
@@ -32,19 +31,18 @@ export class MailComponent implements OnInit {
     });
   }
 
-  ngAfterViewInit(): void {
-    this.emails.paginator = this.paginator;
-  }
-
   loadAllEmails(mailboxId: number): void {
     this.loading = true;
     this.emailService.getEmailsForMailbox(mailboxId).subscribe(
       (data: Mail[]) => {
-        this.emails.data = data.map(email => ({
+        console.log('Fetched Emails with Attachments:', data); // Check if attachments are present
+
+        this.emails = data.map(email => ({
           ...email,
           safeContent: this.sanitizer.bypassSecurityTrustHtml(email.content),
           fullContentVisible: false
-        }));
+        })).sort((a, b) => new Date(b.receivedDate).getTime() - new Date(a.receivedDate).getTime());
+
         this.loading = false;
       },
       (error) => {
@@ -52,11 +50,8 @@ export class MailComponent implements OnInit {
         this.loading = false;
       }
     );
-  }
+}
 
-  // toggleFullContent(emailData: Mail): void {
-  //   emailData.fullContentVisible = !emailData.fullContentVisible;
-  // }
 
   getAttachmentUrl(attachment: any): string {
     return `path_to_attachments/${attachment.filename}`;
