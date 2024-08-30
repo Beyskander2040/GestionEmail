@@ -1,46 +1,52 @@
-<div class="container-fluid">
-  <div class="container-fluid">
-  <div class="row">
-    <div class="col">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th>From</th>
-            <th>Received Date</th>
-            <th>Content</th>
-            <th>Piéces Jointes</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let emailData of emails">
-            <td>{{ emailData.subject }}</td>
-            <td>{{ emailData.sender }}</td>
-            <td>{{ emailData.receivedDate | date:'medium' }}</td>
-            <td (click)="toggleFullContent(emailData)">
-              <div *ngIf="!emailData.fullContentVisible">
-                <span matTooltip="{{ emailData.content }}" matTooltipPosition="above" matTooltipClass="tooltip-content">
-                  {{ emailData.content | slice:0:50 }}{{ emailData.content.length > 50 ? '...' : '' }}
-                </span>
-              </div>
-              <div *ngIf="emailData.fullContentVisible" [innerHTML]="emailData.safeContent"></div>
-            </td>
-            <td>
-              <ul>
-                <li *ngFor="let attachment of emailData.attachments">
-                  <a [href]="getAttachmentUrl(attachment)" download="{{attachment.filename}}">
-                    {{ attachment.filename }}
-                  </a>
-                </li>
-              </ul>
-            </td>
-          </tr>
-          
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="row justify-content-center">
-    <div class="col-auto">
-      <!-- <button class="btn btn-primary" (click)="loadMore()" *ngIf="!allEmailsLoaded && !loading">Load More</button> -->
-      <div *ngIf="loading">
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>From</th>
+        <th>Received Date</th>
+        <th>Content</th>
+        <th>Attachments</th>
+        <th class="actions-column">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let emailData of emails">
+        <td>{{ emailData.subject }}</td>
+        <td>{{ emailData.sender }}</td>
+        <td>{{ emailData.receivedDate | date:'medium' }}</td>
+        <td (click)="toggleFullContent(emailData)">
+          <div *ngIf="!emailData.fullContentVisible">
+            <span matTooltip="{{ emailData.content }}" matTooltipPosition="above" matTooltipClass="tooltip-content">
+              {{ emailData.content | slice:0:50 }}{{ emailData.content.length > 50 ? '...' : '' }}
+            </span>
+          </div>
+          <div *ngIf="emailData.fullContentVisible" [innerHTML]="emailData.safeContent"></div>
+        </td>
+        <td>
+          <ul>
+            <li *ngFor="let attachment of emailData.attachments">
+              <a [href]="getAttachmentUrl(attachment)" download="{{attachment.filename}}">
+                {{ attachment.filename }}
+              </a>
+            </li>
+          </ul>
+        </td>
+        <td class="actions-column">
+          <button class="btn btn-primary" (click)="archiveEmail(emailData.uid, emailData.mailboxId)">Archive
+
+            <i class="fas fa-archive"></i>
+          </button>
+        
+        </td>
+        <td class="actions-column">
+         
+<button class="btn btn-danger" (click)="deleteEmail(emailData.uid, emailData.id, emailData.mailboxId)">
+  <i class="bi-trash"></i> Delete
+</button> 
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>

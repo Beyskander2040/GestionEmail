@@ -24,6 +24,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { AddMailboxDialogComponent } from './add-mailbox-dialog/add-mailbox-dialog.component';
 import { ProgressDialogComponent } from './progress-dialog/progress-dialog.component';
+import { ArchiveComponent } from './archive/archive.component';
 
 
 @NgModule({
@@ -52,7 +53,8 @@ import { ProgressDialogComponent } from './progress-dialog/progress-dialog.compo
     ListMailBoxComponent,
     LoginDialogComponent,
     AddMailboxDialogComponent,
-    ProgressDialogComponent
+    ProgressDialogComponent,
+    ArchiveComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

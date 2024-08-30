@@ -9,13 +9,17 @@ import { AuthGuard } from './auth.guard';
 })
 export class MailBoxService {
   private apiUrl = 'http://localhost:8088/MailBox/api/v1/auth/mailboxes';
-  private apiUrl1 = 'http://localhost:8083/email/api/v1/emails';
   private progressSubject = new Subject<number>();
+  private mailboxId: number | null = null;
 
-
+  setMailboxId(id: number) {
+    this.mailboxId = id;
+  }
+   getMailboxId(): number | null {
+    return this.mailboxId;
+  }
 
   constructor(private http: HttpClient, private authguard : AuthGuard) { }
-   // Fetch mailboxes by user ID
    getMailboxes(userId: number): Observable<any> {
     const token = localStorage.getItem('authToken');
     console.log('Token from localStorage:', localStorage.getItem('authToken'));

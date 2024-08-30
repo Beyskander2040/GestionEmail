@@ -4,6 +4,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { Mail } from 'app/Models/mail';
 import { EmailService } from 'app/Services/email.service';
+import { MailBoxService } from 'app/Services/mail-box.service';
 
 @Component({
   selector: 'app-login-dialog',
@@ -23,7 +24,9 @@ export class LoginDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private emailService: EmailService,
     private sanitizer: DomSanitizer,
-    private router: Router
+    private router: Router,
+    private mailboxService: MailBoxService, // inject the service
+
   ) {
     this.email = data.emailAddress;
     this.password = data.password;
@@ -51,7 +54,8 @@ export class LoginDialogComponent {
             }));
             this.emails = [...this.emails, ...emailsWithSafeContent];
             this.loading = false;
-            this.dialogRef.close({
+            this.mailboxService.setMailboxId(mailboxId); // Save the mailboxId
+           this.dialogRef.close({
               email: this.email,
               password: this.password,
               emails: emailsWithSafeContent,

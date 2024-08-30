@@ -1,6 +1,7 @@
 package com.example.mail.Repository;
 
 import com.example.mail.Entity.Mail;
+import org.hibernate.loader.plan.spi.QuerySpace;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,16 +16,18 @@ import java.util.Optional;
 
 @Repository
 public interface IMailRepository extends PagingAndSortingRepository<Mail,Long> {
-    List<Mail> findByUserEmail(String userEmail);
 
     List<Mail>findByMailboxId(Long mailboxId);
 
-    Optional<Mail> findByUid(String uid);
+    Mail findByUid(String uid);
     Optional<Mail> findByUidAndMailboxId(String uid, Long mailboxId);
-
-
+    @Query("SELECT e.uid FROM Mail e WHERE e.id = :mailId")
+    Long findUidByMailId(@Param("mailId") Long mailId);
     @Query("SELECT COALESCE(MAX(m.receivedDate), NULL) FROM Mail m WHERE m.mailboxId = :mailboxId")
     Date findMostRecentEmailDateByMailboxId(@Param("mailboxId") Long mailboxId);
+
+    List<Mail> findByMailboxIdAndAndArchived(Long mailboxId, Boolean archived);
+
 
 
 }

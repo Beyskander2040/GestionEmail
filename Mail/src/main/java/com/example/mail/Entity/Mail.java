@@ -35,6 +35,8 @@ public class Mail {
     private Long mailboxId;
     @Column(unique = true)
     private String uid;
+    private boolean archived;
+
 
 
 }

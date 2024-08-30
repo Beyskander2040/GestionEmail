@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Mail } from 'app/Models/mail';
 import { Page } from 'app/Models/page';
@@ -71,11 +71,7 @@ export class EmailService {
         })
       );
   }
-  
-
-
-  
-  getEmailsForMailbox(mailboxId: number): Observable<Mail[]> {
+   getEmailsForMailbox(mailboxId: number): Observable<Mail[]> {
   const url = `${this.apiUrl}/all?mailboxId=${mailboxId}`;
   const token = localStorage.getItem('authToken');
   const headers = new HttpHeaders({
@@ -91,8 +87,46 @@ export class EmailService {
       })
     );
 }
+archiveEmail(mailUid: string, mailboxId: number): Observable<any> {
+  const url = `${this.apiUrl}/archive`;
+  const params = new HttpParams()
+  .set('mailUid', encodeURIComponent(mailUid)) // Ensure UUID is URL-encoded
+  .set('mailboxId', mailboxId.toString());
 
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+  });
 
+  return this.http.post(url, null, { headers, params });
+}
+
+getArchivedEmails(mailboxId: number): Observable<any[]> {
+  const token = localStorage.getItem('authToken');
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  });  return this.http.get<any[]>(`${this.apiUrl}/archived-emails?mailboxId=${mailboxId}`, { headers });
+}
+
+deleteEmail(mailUid: string, emailId: number, mailboxId: number): Observable<any> {
+  const url = `${this.apiUrl}/delete`;
+  const params = new HttpParams()
+    .set('mailUid', encodeURIComponent(mailUid)) // Ensure UID is URL-encoded
+    .set('emailId', emailId.toString())
+    .set('mailboxId', mailboxId.toString());
+
+  const token = localStorage.getItem('authToken');
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.delete(url, { headers, params }).pipe(
+    catchError(error => {
+      console.error('Error deleting email:', error);
+      return throwError(error);
+    })
+  );
+}
 
 
 

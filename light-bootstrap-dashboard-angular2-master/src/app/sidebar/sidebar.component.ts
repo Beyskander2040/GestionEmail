@@ -11,8 +11,9 @@ export const ROUTES: RouteInfo[] = [
   
     // { path: '/Mail', title: ' Boite Mail',  icon:'pe-7s-note2', class: '' },
      { path: '/MesBoites', title: 'Mes Boites Mail',  icon:'pe-7s-note2', class: '' },
+     { path: '/archive/:mailboxId', title: 'Archive',  icon:'fa fa-archive', class: '' }
 
-   
+
 ];
 
 @Component({
