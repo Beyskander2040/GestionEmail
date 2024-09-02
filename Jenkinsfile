@@ -20,16 +20,17 @@ pipeline {
                         sh 'mvn install'  
                     }
                     dir('gateway') {  
-                        sh 'mvn install -DskipTests'
+                                sh 'mvn install -DskipTests'
                     }
+                  
                     dir('MailBox') {  
-                        sh 'mvn install -DskipTests'
+                                sh 'mvn install -DskipTests'
                     }
                     dir('User') {  
-                        sh 'mvn install -DskipTests'
+                                sh 'mvn install -DskipTests'
                     }
-                    dir('Mail') {  
-                        sh 'mvn install -DskipTests'
+                      dir('Mail') {  
+                                sh 'mvn install -DskipTests'
                     }
                 }
             }
@@ -39,31 +40,46 @@ pipeline {
             steps {
                 script {
                     dir('EurekaServeur') {  
-                        sh 'mvn package -DskipTests'
+                                sh 'mvn package -DskipTests'
                     }
                     dir('gateway') {  
-                        sh 'mvn package -DskipTests'
+                                sh 'mvn package -DskipTests'
                     }
                     dir('Mail') {  
-                        sh 'mvn package -DskipTests'
+                                sh 'mvn package -DskipTests'
                     }
                     dir('MailBox') {  
-                        sh 'mvn package -DskipTests'
+                                sh 'mvn package -DskipTests'
                     }
                     dir('User') {  
-                        sh 'mvn package -DskipTests'
+                                sh 'mvn package -DskipTests'
                     }
                 }
             }
         }
-
-        stage('SonarQube Analysis') {
+         stage('SonarQube Analysis') {
             steps {
-                sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                script {
+                    dir('EurekaServeur') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                    dir('gateway') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                    dir('MailBox') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                    dir('User') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                    dir('Mail') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                }
             }
-        }
-
-        stage('Deploy to Nexus') {
+        
+    }
+    stage('Deploy to Nexus') {
             steps {
                 script {
                     dir('EurekaServeur') {  
