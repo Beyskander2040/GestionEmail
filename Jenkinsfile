@@ -62,11 +62,7 @@ pipeline {
         //     }
         // }
         
-        stage('Login to Docker Hub') {
-            steps {
-                sh "echo \$DOCKERHUB_CREDENTIALS_PSW | docker login -u \$DOCKERHUB_CREDENTIALS_USR --password-stdin"
-            }
-        }
+        
         
         stage('Build and push Docker Image') {
             steps {
@@ -96,6 +92,7 @@ pipeline {
                     stage('Docker Push') {
                         steps {
                             script {
+                                sh 'docker login -u benelbeyskander465 -p rim21005232'
                                 sh 'docker push benelbeyskander465/user:1.0'
                                 sh 'docker push benelbeyskander465/mail:1.0'
                                 sh 'docker push benelbeyskander465/gateway:1.0'
