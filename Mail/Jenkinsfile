@@ -15,11 +15,13 @@
               }
                stage('Maven Install') {
             steps {
+                dir('Mail')
                 sh 'mvn install'
             }
         }
          stage('Build package') {
             steps {
+                dir('Mail')
                 sh 'mvn package'
             }
         }
