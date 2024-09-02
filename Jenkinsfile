@@ -3,14 +3,12 @@ pipeline {
 
     tools {
         maven 'M2_HOME'
-
-
-    }
+     }
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('benelbeyskander465-dockerhub')
          DOCKER_COMPOSE_VERSION = '1.29.2'
-               DOCKER_IMAGE_TAG = "latest" 
+        DOCKER_IMAGE_TAG = "latest" 
     }
 
     stages {
@@ -105,7 +103,7 @@ pipeline {
                     }
                       stage('Deploy with Docker Compose') {
                     steps {
-                     script 
+                     script { 
 
                      sh 'docker compose up -d'
 
