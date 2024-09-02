@@ -6,12 +6,12 @@ pipeline {
     }
 
     stages {
-        // stage('Checkout Git repository') {
-        //     steps {
-        //         echo 'Pulling code from Git'
-        //         git branch: 'skander', url: 'https://github.com/Beyskander2040/GestionEmail.git'
-        //     }
-        // }
+        stage('Checkout Git repository') {
+            steps {
+                echo 'Pulling code from Git'
+                git branch: 'skander', url: 'https://github.com/Beyskander2040/GestionEmail.git'
+            }
+        }
         
         // stage('Maven Install') {
         //     steps {
