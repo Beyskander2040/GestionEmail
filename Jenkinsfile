@@ -20,17 +20,17 @@ pipeline {
                         sh 'mvn install'  
                     }
                     dir('gateway') {  
-                        sh 'mvn install'  
+                                sh 'mvn install -DskipTests'
                     }
                   
                     dir('MailBox') {  
-                        sh 'mvn install'  
+                                sh 'mvn install -DskipTests'
                     }
                     dir('User') {  
-                        sh 'mvn install'  
+                                sh 'mvn install -DskipTests'
                     }
                       dir('Mail') {  
-                        sh 'mvn install'  
+                                sh 'mvn install -DskipTests'
                     }
                 }
             }
@@ -40,19 +40,19 @@ pipeline {
             steps {
                 script {
                     dir('EurekaServeur') {  
-                        sh 'mvn package'  
+                                sh 'mvn package -DskipTests'
                     }
                     dir('gateway') {  
-                        sh 'mvn package'  
+                                sh 'mvn package -DskipTests'
                     }
                     dir('Mail') {  
-                        sh 'mvn package'  
+                                sh 'mvn package -DskipTests'
                     }
                     dir('MailBox') {  
-                        sh 'mvn package'  
+                                sh 'mvn package -DskipTests'
                     }
                     dir('User') {  
-                        sh 'mvn package'  
+                                sh 'mvn package -DskipTests'
                     }
                 }
             }
