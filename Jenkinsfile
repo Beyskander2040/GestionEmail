@@ -4,6 +4,9 @@ pipeline {
     tools {
         maven 'M2_HOME'
     }
+     environment {
+        DOCKERHUB_CREDENTIALS = credentials('benelbeyskander465-dockerhub')
+    }
 
     stages {
         stage('Checkout Git repository') {
