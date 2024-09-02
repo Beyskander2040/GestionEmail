@@ -57,5 +57,10 @@ pipeline {
                 }
             }
         }
+         stage('SonarQube Analysis') {
+                                           steps {
+                                               sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                                           }
+                                       }
     }
 }
