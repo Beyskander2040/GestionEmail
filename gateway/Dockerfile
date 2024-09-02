@@ -1,4 +1,4 @@
 FROM openjdk:11
 EXPOSE 8088
-ADD target/gateway-1.0.jar gateway-1.0.jar
-ENTRYPOINT ["java", "-jar", "/gateway-1.0.jar"]
+ADD target/Gateway-1.0.jar Gateway-1.0.jar
+ENTRYPOINT ["java", "-jar", "/Gateway-1.0.jar"]
