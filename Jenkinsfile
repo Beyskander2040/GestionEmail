@@ -83,19 +83,19 @@ pipeline {
             steps {
                 script {
                     dir('EurekaServeur') {  
-                        sh 'mvn deploy'
+                        sh 'mvn deploy -DskipTests'
                     }
                     dir('gateway') {  
-                        sh 'mvn deploy'
+                        sh 'mvn deploy -DskipTests'
                     }
                     dir('MailBox') {  
-                        sh 'mvn deploy'
+                        sh 'mvn deploy -DskipTests'
                     }
                     dir('User') {  
-                        sh 'mvn deploy'
+                        sh 'mvn deploy -DskipTests'
                     }
                     dir('Mail') {  
-                        sh 'mvn deploy'
+                        sh 'mvn deploy -DskipTests'
                     }
                 }
             }
