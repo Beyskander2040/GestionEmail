@@ -81,7 +81,7 @@ pipeline {
                                     sh 'docker build -t benelbeyskander465/mailbox:1.0 .'  
                                 }
                                 dir('EurekaServeur') {  
-                                    sh 'docker build -t benelbeyskander465/eurekaServeur:1.0 .'  
+                                    sh 'docker build -t benelbeyskander465/eurekaserveur:1.0 .'  
                                 }
                             }
                         }
