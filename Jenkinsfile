@@ -82,15 +82,15 @@ pipeline {
     stage('Deploy to Nexus') {
             steps {
                 script {
-                    dir('EurekaServeur') {  
-                        sh 'mvn deploy -DskipTests'
-                    }
-                    dir('gateway') {  
-                        sh 'mvn deploy -DskipTests'
-                    }
-                    dir('MailBox') {  
-                        sh 'mvn deploy -DskipTests'
-                    }
+                    // dir('EurekaServeur') {  
+                    //     sh 'mvn deploy -DskipTests'
+                    // }
+                    // dir('gateway') {  
+                    //     sh 'mvn deploy -DskipTests'
+                    // }
+                    // dir('MailBox') {  
+                    //     sh 'mvn deploy -DskipTests'
+                    // }
                     dir('User') {  
                         sh 'mvn deploy -DskipTests'
                     }
