@@ -79,27 +79,41 @@ pipeline {
         //     }
         
     // }
-    stage('Deploy to Nexus') {
-            steps {
-                script {
-                    // dir('EurekaServeur') {  
-                    //     sh 'mvn deploy -DskipTests'
-                    // }
-                    // dir('gateway') {  
-                    //     sh 'mvn deploy -DskipTests'
-                    // }
-                    // dir('MailBox') {  
-                    //     sh 'mvn deploy -DskipTests'
-                    // }
-                    // dir('User') {  
-                    //     sh 'mvn deploy -DskipTests -X'
-                    // }
-                    dir('Mail') {  
-                        sh 'mvn deploy -DskipTests'
-                    }
-                }
+    // stage('Deploy to Nexus') {
+    //         steps {
+    //             script {
+    //                 // dir('EurekaServeur') {  
+    //                 //     sh 'mvn deploy -DskipTests'
+    //                 // }
+    //                 // dir('gateway') {  
+    //                 //     sh 'mvn deploy -DskipTests'
+    //                 // }
+    //                 // dir('MailBox') {  
+    //                 //     sh 'mvn deploy -DskipTests'
+    //                 // }
+    //                 // dir('User') {  
+    //                 //     sh 'mvn deploy -DskipTests -X'
+    //                 // }
+    //                 dir('Mail') {  
+    //                     sh 'mvn deploy -DskipTests'
+    //                 }
+    //             }
+    //         }
+    //     }
+     stage('Build Docker Image') {
+              steps {
+                 script {
+                  sh 'sudo docker build -t benelbeyskander465/User:1.0 .'
+                  sh 'sudo docker build -t benelbeyskander465/Mail:1.0 .'
+                  sh 'sudo docker build -t benelbeyskander465/gateway:1.0 .'
+                  sh 'sudo docker build -t benelbeyskander465/MailBox:1.0 .'
+                  sh 'sudo docker build -t benelbeyskander465/EurekaServeur:1.0 .'
+
+
             }
-        }
+         }
+
+     }
     }
 }
 
