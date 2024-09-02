@@ -74,9 +74,9 @@ pipeline {
                                 dir('Mail') {  
                                     sh 'docker build -t benelbeyskander465/mail:1.0 .'  
                                 }
-                                // dir('Gateway') {  
-                                //     // sh 'docker build -t benelbeyskander465/gateway:1.0 .'  
-                                // }
+                                 dir('gateway') {  
+                                      sh 'docker build -t benelbeyskander465/gateway:1.0 .'  
+                                 }
                                 dir('MailBox') {  
                                     sh 'docker build -t benelbeyskander465/mailbox:1.0 .'  
                                 }
