@@ -13,16 +13,24 @@
                       git branch: 'skander', url:'https://github.com/Beyskander2040/GestionEmail.git'
                   }
               }
-               stage('Maven Install') {
+           stage('Maven Install') {
             steps {
-                sh 'mvn install'
+                script {
+                    dir('Mail') {  
+                        sh 'mvn install'  
+                    }
+                }
             }
         }
-         stage('Build package') {
+        stage('Build Package') {
             steps {
-                sh 'mvn package'
+                script {
+                    dir('Mail') {  
+                        sh 'mvn package' 
+                    }
+                }
             }
         }
+    }
     
-}
  }
