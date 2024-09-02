@@ -5,12 +5,10 @@ pipeline {
         maven 'M2_HOME'
         
     }
-    
     environment {
-        DOCKER_COMPOSE_VERSION = '1.29.2' // Set the version you need
-        DOCKER_IMAGE_TAG = "latest" // Tag for your Docker images
+        DOCKER_COMPOSE_VERSION = '1.29.2' // Version de Docker Compose à utiliser
     }
-    stages {
+        stages {
         stage('Checkout Git repository') {
             steps {
                 echo 'Pulling code from Git'
