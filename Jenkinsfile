@@ -94,7 +94,7 @@ pipeline {
                                 sh 'docker push benelbeyskander465/user:1.0'
                                 sh 'docker push benelbeyskander465/mail:1.0'
                                 sh 'docker push benelbeyskander465/gateway:1.0'
-                                sh 'docker push benelbeyskander465/mailBox:1.0'
+                                sh 'docker push benelbeyskander465/mailbox:1.0'
                                 sh 'docker push benelbeyskander465/eurekaServeur:1.0'
                             }
                         }
