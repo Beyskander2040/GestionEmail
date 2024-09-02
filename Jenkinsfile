@@ -91,9 +91,9 @@ pipeline {
                     // dir('MailBox') {  
                     //     sh 'mvn deploy -DskipTests'
                     // }
-                    dir('User') {  
-                        sh 'mvn deploy -DskipTests -X'
-                    }
+                    // dir('User') {  
+                    //     sh 'mvn deploy -DskipTests -X'
+                    // }
                     dir('Mail') {  
                         sh 'mvn deploy -DskipTests'
                     }
