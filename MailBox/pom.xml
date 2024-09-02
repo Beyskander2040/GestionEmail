@@ -19,11 +19,7 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.example</groupId>
-            <artifactId>mail</artifactId>
-            <version>0.0.3-SNAPSHOT</version>
-        </dependency>
+
 
         <!-- Spring Boot dependencies -->
         <dependency>
