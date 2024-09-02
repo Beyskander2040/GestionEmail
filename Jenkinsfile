@@ -69,19 +69,19 @@ pipeline {
                         steps {
                             script {
                                 dir('User') {  
-                                    sh 'sudo docker build -t benelbeyskander465/user:1.0 .'  
+                                    sh 'docker build -t benelbeyskander465/user:1.0 .'  
                                 }
                                 dir('Mail') {  
-                                    sh ' sudo docker build -t benelbeyskander465/mail:1.0 .'  
+                                    sh 'docker build -t benelbeyskander465/mail:1.0 .'  
                                 }
                                 dir('Gateway') {  
-                                    sh 'sudo docker build -t benelbeyskander465/gateway:1.0 .'  
+                                    sh 'docker build -t benelbeyskander465/gateway:1.0 .'  
                                 }
                                 dir('MailBox') {  
-                                    sh 'sudo docker build -t benelbeyskander465/mailBox:1.0 .'  
+                                    sh 'docker build -t benelbeyskander465/mailBox:1.0 .'  
                                 }
                                 dir('EurekaServeur') {  
-                                    sh 'sudo docker build -t benelbeyskander465/eurekaServeur:1.0 .'  
+                                    sh 'docker build -t benelbeyskander465/eurekaServeur:1.0 .'  
                                 }
                             }
                         }
