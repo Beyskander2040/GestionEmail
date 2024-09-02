@@ -99,13 +99,12 @@ pipeline {
                         }
                     }
                      stage('Deploy with Docker Compose') {
-                                                                                                              steps {
-                                                                                                                  script {
+                                                       steps {
+                                                               script {
 
-                                                                                                                          sh 'docker compose up -d'
-
-                                                                                                                  }
-                                                                                                              }
+                                                                         sh 'docker compose up -d'
+                                                          }
+                                     }
                 }
             }
 }
