@@ -16,7 +16,7 @@ services:
 
   # Eureka Server
   eureka-server:
-    image: eureka-server:latest
+    image: eurekaserveur:latest
     build:
       context: .
       dockerfile: Dockerfile.eureka
@@ -24,24 +24,24 @@ services:
       - "8761:8761"
 
   # MailBox Service
-  # mailbox:
-  #   image: mailbox-service:latest
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.mailbox
-  #   ports:
-  #     - "8086:8086"
-  #   environment:
-  #     - SPRING_APPLICATION_NAME=MailBox
-  #     - SERVER_SERVLET_CONTEXT_PATH=/MailBox
-  #     - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/MailBoxDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
-  #     - SPRING_DATASOURCE_USERNAME=root
-  #     - SPRING_DATASOURCE_PASSWORD=
-  #     - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+  mailbox:
+    image: mailbox:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.mailbox
+    ports:
+      - "8086:8086"
+    environment:
+      - SPRING_APPLICATION_NAME=MailBox
+      - SERVER_SERVLET_CONTEXT_PATH=/MailBox
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/MailBoxDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
 
   # Mail Service
   mail:
-    image: mail-service:latest
+    image: mail:latest
     build:
       context: .
       dockerfile: Dockerfile.mail
@@ -57,7 +57,7 @@ services:
 
   # User Service
   user:
-    image: user-service:latest
+    image: user:latest
     build:
       context: .
       dockerfile: Dockerfile.user
