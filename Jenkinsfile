@@ -70,9 +70,9 @@ pipeline {
                     stage('Docker Build') {
                         steps {
                             script {
-                                dir('User') {  
+                                
                                     sh 'sudo docker build -t benelbeyskander465/user:1.0 .'  
-                                }
+                                
                                 dir('Mail') {  
                                     sh ' sudo docker build -t benelbeyskander465/mail:1.0 .'  
                                 }
