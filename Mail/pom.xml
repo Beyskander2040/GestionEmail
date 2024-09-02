@@ -12,7 +12,7 @@
 
     <groupId>com.example</groupId>
     <artifactId>Mail</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>Mail</name>
     <description>Mail</description>
 
