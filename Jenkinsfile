@@ -92,7 +92,7 @@ pipeline {
                     //     sh 'mvn deploy -DskipTests'
                     // }
                     dir('User') {  
-                        sh 'mvn deploy -DskipTests'
+                        sh 'mvn deploy -DskipTests -X'
                     }
                     dir('Mail') {  
                         sh 'mvn deploy -DskipTests'
