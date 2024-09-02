@@ -3,6 +3,10 @@ pipeline {
 
     tools {
         maven 'M2_HOME'
+       DOCKER_COMPOSE_VERSION = '1.29.2'
+               DOCKER_IMAGE_TAG = "latest" // Tag for your Docker images
+
+
     }
     
     environment {
@@ -99,6 +103,14 @@ pipeline {
                             }
                         }
                     }
+                      stage('Deploy with Docker Compose') {
+                    steps {
+                     script 
+
+                     sh 'docker compose up -d'
+
+                     }
+                     }
                 }
             }
         
