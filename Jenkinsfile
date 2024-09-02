@@ -69,7 +69,7 @@ pipeline {
                         steps {
                             script {
                                 dir('User') {  
-                                    sh 'docker build -t benelbeyskander465/user:1.0 .'  
+                                    sh 'docker build -t benelbeyskander465/User:1.0 .'  
                                 }
                                 dir('Mail') {  
                                     sh 'docker build -t benelbeyskander465/mail:1.0 .'  
