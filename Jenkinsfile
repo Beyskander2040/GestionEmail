@@ -22,13 +22,14 @@ pipeline {
                     dir('gateway') {  
                         sh 'mvn install'  
                     }
-                    dir('Mail') {  
-                        sh 'mvn install'  
-                    }
+                  
                     dir('MailBox') {  
                         sh 'mvn install'  
                     }
                     dir('User') {  
+                        sh 'mvn install'  
+                    }
+                      dir('Mail') {  
                         sh 'mvn install'  
                     }
                 }
