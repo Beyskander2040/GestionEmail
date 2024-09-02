@@ -64,15 +64,13 @@ pipeline {
         
         
         
-        stage('Build and push Docker Image') {
-            steps {
-                script {
+        
                     stage('Docker Build') {
                         steps {
                             script {
-                                
+                                dir('User') {  
                                     sh 'sudo docker build -t benelbeyskander465/user:1.0 .'  
-                                
+                                }
                                 dir('Mail') {  
                                     sh ' sudo docker build -t benelbeyskander465/mail:1.0 .'  
                                 }
@@ -103,6 +101,6 @@ pipeline {
                     }
                 }
             }
-        }
-    }
-}
+        
+    
+
