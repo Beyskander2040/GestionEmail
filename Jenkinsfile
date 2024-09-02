@@ -58,9 +58,26 @@ pipeline {
             }
         }
          stage('SonarQube Analysis') {
-                                           steps {
-                                               sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
-                                           }
-                                       }
+            steps {
+                script {
+                    dir('EurekaServeur') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                    dir('gateway') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                    dir('MailBox') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                    dir('User') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                    dir('Mail') {  
+                        sh "mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=adminadmin"
+                    }
+                }
+            }
+        
+    }
     }
 }
