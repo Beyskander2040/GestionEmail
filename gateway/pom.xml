@@ -82,12 +82,12 @@
         </plugins>
     </build>
     <distributionManagement>
-        <repository>
-            <id>deploymentRepo</id>
-            <url>http://192.168.1.184:8081/repository/maven-releases/</url>
+    <repository>
+        <id>deploymentRepo</id>
+        <url>http://192.168.1.184:8081/repository/maven-releases/</url>
 
-        </repository>
-    </distributionManagement>
+    </repository>
+</distributionManagement>
     <repositories>
         <repository>
             <id>spring-milestones</id>
