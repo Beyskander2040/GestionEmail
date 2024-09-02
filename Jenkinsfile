@@ -112,11 +112,11 @@ pipeline {
               steps {
                  script {
                     //  sh 'docker login -u benelbeyskander465 -p rim21005232'
-                  sh 'sudo docker build -t benelbeyskander465/User:1.0 .'
-                  sh 'sudo docker build -t benelbeyskander465/Mail:1.0 .'
-                  sh 'sudo docker build -t benelbeyskander465/gateway:1.0 .'
-                  sh 'sudo docker build -t benelbeyskander465/MailBox:1.0 .'
-                  sh 'sudo docker build -t benelbeyskander465/EurekaServeur:1.0 .'
+                  sh 'docker build -t benelbeyskander465/User:1.0 .'
+                  sh 'docker build -t benelbeyskander465/Mail:1.0 .'
+                  sh 'docker build -t benelbeyskander465/gateway:1.0 .'
+                  sh 'docker build -t benelbeyskander465/MailBox:1.0 .'
+                  sh 'docker build -t benelbeyskander465/EurekaServeur:1.0 .'
 
                 //   sh 'sudo docker push -t benelbeyskander465/User:1.0 .'
                 //   sh 'sudo docker push -t benelbeyskander465/Mail:1.0 .'
