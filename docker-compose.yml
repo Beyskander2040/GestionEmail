@@ -47,7 +47,7 @@ services:
       - SPRING_APPLICATION_NAME=MailBox
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/MailBoxDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_DATASOURCE_PASSWORD=root
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
     networks:
       - app-network
@@ -68,7 +68,7 @@ services:
       - SPRING_APPLICATION_NAME=Mail
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/MailDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_DATASOURCE_PASSWORD=root
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
     networks:
       - app-network
@@ -89,7 +89,7 @@ services:
       - SPRING_APPLICATION_NAME=User
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/UserrrDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_DATASOURCE_PASSWORD=root
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
     networks:
       - app-network
