@@ -34,7 +34,7 @@ services:
     environment:
       - SPRING_APPLICATION_NAME=MailBox
       - SERVER_SERVLET_CONTEXT_PATH=/MailBox
-       -SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/MailBoxDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3307/MailBoxDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
@@ -72,13 +72,14 @@ services:
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
 
   # MySQL Database  
-db:
+  db:
   image: mysql:8.0
   container_name: mysql-container
   environment:
     MYSQL_ROOT_PASSWORD: root
     MYSQL_DATABASE: GestionEmailDB
   ports:
-    - "3307:3306"  # Change to 3306:3306
+    - "3307:3306"  # Host port 3307 mapped to container port 3306
   volumes:
     - mysql_data:/var/lib/mysql
+
