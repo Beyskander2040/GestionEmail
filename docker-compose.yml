@@ -1,6 +1,21 @@
 version: '3.8'
 
 services:
+  # Eureka Server
+  eureka-server:
+    image: eurekaserveur:latest
+    build:
+      context: ./EurekaServeur
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    environment:
+      - SERVER_PORT=8761
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+    networks:
+      - app-network
+
   # Gateway Service
   gateway:
     image: gateway:latest
@@ -10,18 +25,14 @@ services:
     ports:
       - "8088:8088"
     environment:
+      - SERVER_PORT=8088
       - SPRING_APPLICATION_NAME=gateway
-      # - SERVER_SERVLET_CONTEXT_PATH=/Gateway
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
-
-  # Eureka Server
-  eureka-server:
-    image: eurekaserveur:latest
-    build:
-      context: ./EurekaServeur
-      dockerfile: Dockerfile
-    ports:
-      - "8761:8761"
+      - SPRING_CLOUD_GATEWAY_DISCOVERY_LOCATOR_ENABLED=true
+    networks:
+      - app-network
+    depends_on:
+      - eureka-server
 
   # MailBox Service
   mailbox:
@@ -32,12 +43,17 @@ services:
     ports:
       - "8086:8086"
     environment:
+      - SERVER_PORT=8086
       - SPRING_APPLICATION_NAME=MailBox
-      - SERVER_SERVLET_CONTEXT_PATH=/MailBox
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/MailBoxDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    networks:
+      - app-network
+    depends_on:
+      - eureka-server
+      - db
 
   # Mail Service
   mail:
@@ -48,12 +64,17 @@ services:
     ports:
       - "8083:8083"
     environment:
+      - SERVER_PORT=8083
       - SPRING_APPLICATION_NAME=Mail
-      - SERVER_SERVLET_CONTEXT_PATH=/Mail
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/MailDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    networks:
+      - app-network
+    depends_on:
+      - eureka-server
+      - db
 
   # User Service
   user:
@@ -64,12 +85,17 @@ services:
     ports:
       - "8082:8082"
     environment:
+      - SERVER_PORT=8082
       - SPRING_APPLICATION_NAME=User
-      - SERVER_SERVLET_CONTEXT_PATH=/User
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/UserDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/UserrrDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
+    networks:
+      - app-network
+    depends_on:
+      - eureka-server
+      - db
 
   # MySQL Database  
   db:
@@ -82,6 +108,12 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   mysql_data:
