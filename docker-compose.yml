@@ -73,13 +73,15 @@ services:
 
   # MySQL Database  
   db:
-  image: mysql:8.0
-  container_name: mysql-container
-  environment:
-    MYSQL_ROOT_PASSWORD: root
-    MYSQL_DATABASE: GestionEmailDB
-  ports:
-    - "3307:3306"  # Host port 3307 mapped to container port 3306
-  volumes:
-    - mysql_data:/var/lib/mysql
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: GestionEmailDB
+    ports:
+      - "3307:3306"  # Host port 3307 mapped to container port 3306
+    volumes:
+      - mysql_data:/var/lib/mysql
 
+volumes:
+  mysql_data:
