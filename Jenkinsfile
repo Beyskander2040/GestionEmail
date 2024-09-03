@@ -16,50 +16,50 @@ pipeline {
             }
         }
         
-        // Uncomment these stages if you want to build the Maven packages
-        // stage('Maven Install') {
-        //     steps {
-        //         script {
-        //             dir('EurekaServeur') {  
-        //                 sh 'mvn install -DskipTests'  
-        //             }
-        //             dir('gateway') {  
-        //                 sh 'mvn install -DskipTests'
-        //             }
-        //             dir('MailBox') {  
-        //                 sh 'mvn install -DskipTests'
-        //             }
-        //             dir('User') {  
-        //                 sh 'mvn install -DskipTests'
-        //             }
-        //             dir('Mail') {  
-        //                 sh 'mvn install -DskipTests'
-        //             }
-        //         }
-        //     }
-        // }
+        Uncomment these stages if you want to build the Maven packages
+        stage('Maven Install') {
+            steps {
+                script {
+                    dir('EurekaServeur') {  
+                        sh 'mvn install -DskipTests'  
+                    }
+                    dir('gateway') {  
+                        sh 'mvn install -DskipTests'
+                    }
+                    dir('MailBox') {  
+                        sh 'mvn install -DskipTests'
+                    }
+                    dir('User') {  
+                        sh 'mvn install -DskipTests'
+                    }
+                    dir('Mail') {  
+                        sh 'mvn install -DskipTests'
+                    }
+                }
+            }
+        }
 
-        // stage('Build Package') {
-        //     steps {
-        //         script {
-        //             dir('EurekaServeur') {  
-        //                 sh 'mvn package -DskipTests'
-        //             }
-        //             dir('gateway') {  
-        //                 sh 'mvn package -DskipTests'
-        //             }
-        //             dir('Mail') {  
-        //                 sh 'mvn package -DskipTests'
-        //             }
-        //             dir('MailBox') {  
-        //                 sh 'mvn package -DskipTests'
-        //             }
-        //             dir('User') {  
-        //                 sh 'mvn package -DskipTests'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Build Package') {
+            steps {
+                script {
+                    dir('EurekaServeur') {  
+                        sh 'mvn package -DskipTests'
+                    }
+                    dir('gateway') {  
+                        sh 'mvn package -DskipTests'
+                    }
+                    dir('Mail') {  
+                        sh 'mvn package -DskipTests'
+                    }
+                    dir('MailBox') {  
+                        sh 'mvn package -DskipTests'
+                    }
+                    dir('User') {  
+                        sh 'mvn package -DskipTests'
+                    }
+                }
+            }
+        }
         
         
         
