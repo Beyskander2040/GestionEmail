@@ -34,7 +34,7 @@ services:
     environment:
       - SPRING_APPLICATION_NAME=MailBox
       - SERVER_SERVLET_CONTEXT_PATH=/MailBox
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/MailBoxDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3307/MailBoxDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
@@ -50,7 +50,7 @@ services:
     environment:
       - SPRING_APPLICATION_NAME=Mail
       - SERVER_SERVLET_CONTEXT_PATH=/Mail
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/MailDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3307/MailDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
@@ -66,7 +66,7 @@ services:
     environment:
       - SPRING_APPLICATION_NAME=User
       - SERVER_SERVLET_CONTEXT_PATH=/User
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/UserrrDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3307/UserrrDB?useUnicode=true&useJDBCCompliantTimezoneShift=true&createDatabaseIfNotExist=true&useLegacyDatetimeCode=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
       - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka-server:8761/eureka
@@ -79,7 +79,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: GestionEmailDB
     ports:
-      - "3306:3306"
+      - "3307:3307"
     volumes:
       - mysql_data:/var/lib/mysql
 
