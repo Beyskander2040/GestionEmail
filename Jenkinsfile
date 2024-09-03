@@ -16,7 +16,6 @@ pipeline {
             }
         }
         
-        Uncomment these stages if you want to build the Maven packages
         stage('Maven Install') {
             steps {
                 script {
