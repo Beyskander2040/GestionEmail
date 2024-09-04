@@ -127,6 +127,13 @@ deleteEmail(mailUid: string, emailId: number, mailboxId: number): Observable<any
     })
   );
 }
+getTopDomainsWithAttachments(): Observable<any> {
+  const token = localStorage.getItem('authToken');
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+  return this.http.get(`${this.apiUrl}/top-domains-attachments`, { headers });
+}
 
 
 

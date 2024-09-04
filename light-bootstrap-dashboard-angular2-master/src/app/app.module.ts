@@ -25,6 +25,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { AddMailboxDialogComponent } from './add-mailbox-dialog/add-mailbox-dialog.component';
 import { ProgressDialogComponent } from './progress-dialog/progress-dialog.component';
 import { ArchiveComponent } from './archive/archive.component';
+import { TopDomainsChartComponent } from './top-domains-chart/top-domains-chart.component';
 
 
 @NgModule({
@@ -54,7 +55,8 @@ import { ArchiveComponent } from './archive/archive.component';
     LoginDialogComponent,
     AddMailboxDialogComponent,
     ProgressDialogComponent,
-    ArchiveComponent
+    ArchiveComponent,
+    TopDomainsChartComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

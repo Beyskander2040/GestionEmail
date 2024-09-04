@@ -252,4 +252,8 @@ public class MailControlleur {
 
         return ResponseEntity.ok("Email deleted successfully");
     }
+    @GetMapping("/top-domains-attachments")
+    public List<Map<String, Object>> getTopDomainsWithAttachments() {
+        return emailService.getTopDomainsWithAttachments();
+    }
 }

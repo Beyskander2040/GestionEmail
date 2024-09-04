@@ -478,16 +478,16 @@ private SessionService sessionService ;
         return store;
     }
 @Override
-    public List<Map<String, Object>> getTopDomainsWithAttachments() {
-        String sql = "SELECT SUBSTRING_INDEX(mail.sender, '@', -1) AS domainName, " +
-                "COUNT(attachment.id) AS attachmentCount " +
-                "FROM mail " +
-                "JOIN attachment ON mail.id = attachment.mail_id " +
-                "GROUP BY domainName " +
-                "ORDER BY attachmentCount DESC " +
-                "LIMIT 10";
-        return jdbcTemplate.queryForList(sql);
-    }
+public List<Map<String, Object>> getTopDomainsWithAttachments() {
+    String sql = "SELECT SUBSTRING_INDEX(mail.sender, '@', -1) AS domainName, " +
+            "COUNT(att.id) AS attachmentCount " +
+            "FROM mail " +
+            "JOIN attachments att ON mail.id = att.mail_id " +
+            "GROUP BY domainName " +
+            "ORDER BY attachmentCount DESC " +
+            "LIMIT 10";
+    return jdbcTemplate.queryForList(sql);
+}
 
 
 }
